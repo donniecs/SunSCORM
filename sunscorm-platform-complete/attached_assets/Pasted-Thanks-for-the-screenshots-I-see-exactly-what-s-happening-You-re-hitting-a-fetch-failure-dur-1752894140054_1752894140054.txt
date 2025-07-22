@@ -1,0 +1,78 @@
+Thanks for the screenshots — I see exactly what's happening.
+
+You're hitting a `fetch` failure during the `POST /api/dispatches` request triggered by the **"Assign Courses"** modal. Here’s a breakdown of the issue and how to fix it.
+
+---
+
+## 🔍 Root Cause Summary:
+
+* **Error Type:** `fetch` rejected at the request layer
+* **Failure Location:** `request.ts` (your internal API wrapper)
+* **Issue Trigger:** Backend `POST /api/dispatches` returns a **non-2xx response**
+* **Symptom in UI:** `Assignment Failed` toast with no visible error trace
+* **Confirmed by:** Screenshot showing `.status !== 2xx` block hit
+
+---
+
+## ✅ Action Plan (Do This)
+
+### ✅ Step 1: Print real error message
+
+Edit your `request.ts` (around line 7):
+
+**Replace this:**
+
+```ts
+if (!res.ok) throw new Error(await res.text());
+```
+
+**With this:**
+
+```ts
+if (!res.ok) {
+  const errText = await res.text();
+  console.error(`[API Error]: ${res.status} ${errText}`);
+  throw new Error(errText);
+}
+```
+
+Then try again — this will print the **real error** in the browser console, so we know exactly what the backend rejected (most likely: validation error, auth block, or bad input).
+
+---
+
+### ✅ Step 2: Open DevTools → Network Tab → Click the failing `POST /api/dispatches` call
+
+Check:
+
+* Status code (403? 500? 422?)
+* Response body: what did the backend say?
+* Request body: did it send `tenantId`, `courseId`, `maxUsers`, `expiresAt` correctly?
+
+Let me know what it says — or upload the screenshot of that panel.
+
+---
+
+## 🧠 Common Backend Rejection Reasons (Likely)
+
+From your system’s architecture, here’s what likely caused the failure:
+
+| Reason                                        | Fix                                                   |
+| --------------------------------------------- | ----------------------------------------------------- |
+| 🔒 Missing session or not logged in as admin  | Confirm admin token is present via cookies or headers |
+| ❌ Missing `tenantId` or `courseId` in request | Check modal form passes the right values              |
+| 🚫 Dispatch already exists                    | Check if `dispatches` table rejects duplicates        |
+| 🐛 Backend throws a raw error                 | Agent may have missed a try/catch block               |
+
+---
+
+## ⏩ Want me to write a scoped Replit Agent prompt next?
+
+> 📌 Fix the `POST /api/dispatches` endpoint to:
+
+* Validate inputs clearly
+* Return JSON error messages (not raw HTML or console logs)
+* Gracefully reject duplicate dispatches with status `409 Conflict`
+
+Or do you want to send me the actual network panel response first?
+
+Either way — you're one fix away from bulk dispatches working. Let's get it done.

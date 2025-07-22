@@ -1,0 +1,82 @@
+
+---
+
+# 🧠 YOUR CORE MISSION RIGHT NOW
+
+**Fix SCORM uploads on the deployed site.** They’re failing with `413 Payload Too Large`. This blocks testing, dispatching, and core SCORM functionality. **Fix this FIRST or nothing else matters.**
+
+---
+
+# 📦 WHAT’S BROKEN?
+
+Uploading a SCORM `.zip` file (e.g., 220MB) on your deployed Replit instance gives:
+
+```http
+413 Payload Too Large
+```
+
+Even though the progress bar goes to 100%, the backend crashes the request due to a hard-coded size limit.
+
+---
+
+# 🎯 WHAT WE NEED TO DO (COMMANDS TO REPLIT AGENT)
+
+## ✅ Ask the Agent This, Word for Word:
+
+```md
+🔧 Fix SCORM Uploads — 413 Payload Too Large
+
+We are running a SCORM dispatch platform (Sun-SCORM). On the deployed domain, uploading a large `.zip` SCORM course (200MB–400MB) fails with:
+
+```
+
+POST /api/courses/upload → 413 Payload Too Large
+
+```
+
+✅ Fix This System-Wide:
+1. Increase file size limits in `multer` (or whatever middleware handles uploads) to **at least 512MB**
+2. Ensure Express has `limit` config: `express.json({ limit: '512mb' })`
+3. Confirm you're NOT using `bodyParser.json()` for file uploads — that breaks it
+4. Ensure the Replit Web Service deployment accepts large payloads (no internal caps)
+5. Test upload end-to-end in deployed domain (not just locally)
+
+📁 Path of Concern:
+- `/api/courses/upload` (backend route)
+- File goes to `/uploads` folder
+- `imsmanifest.xml` is extracted and parsed — make sure this logic is untouched
+
+🧪 Final Test:
+- Upload a 250MB+ SCORM `.zip`
+- Confirm upload succeeds
+- Course appears in admin dashboard
+- Preview launches and loads normally
+
+🎯 This is urgent — this feature is blocking all dispatch and LMS testing.
+
+```
+
+---
+
+# 🧱 FILES LIKELY TO BE INVOLVED
+
+Your Replit Agent will need to check and fix:
+
+* `server/routes/courses.ts` or `courses.js`
+* Any config to `multer` or `express-fileupload`
+* Replit deployment config (Web Service mode, `replit.nix` if using custom RAM)
+
+---
+
+# 🧠 AFTER THIS IS FIXED
+
+Once this is resolved, the next three steps will be:
+
+1. ✅ **Add Preview SCORM on Site** — Let admin run SCORM in-course page to confirm it’s working before dispatching.
+2. ✅ **Add Systematic Delete** — Allow deleting courses without wiping dispatch history.
+3. ✅ **Fix Dispatch Token & launch flow** — Make sure launch URL works *in TalentLMS* and doesn’t 403.
+
+But **none of that can happen** if you can’t upload a course.
+
+---
+

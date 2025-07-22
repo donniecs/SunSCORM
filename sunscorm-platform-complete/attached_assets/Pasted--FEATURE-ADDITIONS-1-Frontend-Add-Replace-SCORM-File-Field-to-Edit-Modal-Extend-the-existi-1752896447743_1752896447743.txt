@@ -1,0 +1,73 @@
+🧩 FEATURE ADDITIONS
+📁 1. [Frontend] Add "Replace SCORM File" Field to Edit Modal
+Extend the existing course edit modal (already present, confirmed) with:
+
+A new file upload field:
+
+vbnet
+Copy
+Edit
+Label: Replace SCORM File (optional)
+Type: file (.zip)
+It should only allow .zip, and replace the previous SCORM file if a new one is uploaded
+
+Clearly display:
+
+“Uploading a new file will overwrite the current SCORM package for this course across all dispatches.”
+
+🧠 2. [Backend] Replace Stored File Logic
+When a SCORM file is included in the update:
+
+Use existing SCORM processing logic (from course upload)
+
+Replace the stored file (storage location, database pointer, and parsed manifest)
+
+File storage path must remain stable, e.g.:
+/uploads/courses/{courseId}/scorm.zip
+
+Overwriting ensures that existing dispatches point to the updated file automatically
+
+🔁 3. [Dispatch Consistency Behavior]
+All past and future dispatches that point to courseId=X should:
+
+Immediately use the new SCORM file after update
+
+There should be no need to re-dispatch if file is changed
+
+Keep the courseId → file mapping centralized
+
+🛑 Edge Cases to Handle
+Case	Behavior
+Admin edits metadata only	No file overwrite happens
+Admin uploads new .zip	Old one is replaced, database updated
+Invalid .zip	Reject and toast error
+Dispatches exist	They now serve the updated file
+Course is new	No overwrite logic needed (already handled by uploader)
+
+✅ UX Requirements
+Form validation for .zip only
+
+Show a status toast:
+
+“Course updated — new file uploaded successfully.”
+
+or “Course updated — no file change.”
+
+Keep the flow seamless — the admin should not need to re-assign anything
+
+🚫 DO NOT:
+Do not create a new course record — this is a replacement
+
+Do not mutate dispatch records — they should be unaffected
+
+Do not allow non-zip files to be uploaded
+
+Do not duplicate storage paths — overwrite cleanly
+
+🧪 Testing Checklist
+Action	Expected Outcome
+Upload new SCORM zip	Old file gone, dispatches use new one
+No file uploaded	Only metadata updates
+Click “Download Launch File” in company view	Serves updated content
+Try to upload non-zip	Error toast, no update happens
+Upload malformed zip	Error toast from SCORM parser

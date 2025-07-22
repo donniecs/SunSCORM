@@ -1,0 +1,83 @@
+🛠️ REPLIT AGENT PROMPT — ADD COURSE EDIT FUNCTIONALITY
+🎯 Objective:
+Allow admins to edit an existing course — including its title, description, version, and tags — via a new “Edit” button on the course card.
+
+This must reuse existing components and backend routes wherever possible. Avoid duplicating routes or schema definitions. Make sure this integrates cleanly into the admin flow.
+
+🧩 FEATURE BREAKDOWN
+📁 1. [Frontend] Add "Edit" Button to Course Card
+On the /admin/courses page, for each course card:
+
+Add a 3-dot menu (<DropdownMenu>) or a small “Edit” button
+
+When clicked → opens a modal or navigates to a new route:
+
+bash
+Copy
+Edit
+/admin/courses/[courseId]/edit
+If modal feels cramped for tags/fields, default to page instead of modal
+
+✏️ 2. [Frontend] Build Course Edit Form
+Route: /admin/courses/[courseId]/edit
+
+Pre-fill the form with existing course data from /api/courses/:id
+
+Editable fields:
+
+Title
+
+Description
+
+Version
+
+Tags (same comma-separated input from upload)
+
+Keep UI consistent with the upload page
+
+Include a “Save Changes” button with full validation
+
+🔁 3. [Backend] Update Course Logic
+Confirm existence of backend endpoint:
+
+PUT /api/courses/:id
+
+If missing: create it
+
+Must validate incoming data and overwrite only changed fields
+
+Tags must be parsed and normalized (trim, lowercase)
+
+✅ 4. [Validation + UX Expectations]
+Client-side and server-side validation:
+
+No empty title/version
+
+No malformed tag strings
+
+Upon save:
+
+Redirect to /admin/courses
+
+Show success toast: "Course updated successfully"
+
+If error:
+
+Render error toast with fallback text: "Update failed — try again"
+
+🧪 QA CHECKLIST (must pass)
+Feature	Behavior
+Edit button	Opens modal or navigates to editor
+Pre-filled data	Title, description, version, tags show up
+Editable tags	Comma-separated field working like upload
+Backend update	Validates and persists changes
+Case normalization	Tags updated and stored lowercase
+Post-save redirect	Returns to course catalog with toast
+
+🔍 SPECIAL INSTRUCTIONS
+🧠 DO NOT create new paths or APIs unless you confirm they're not already implemented.
+
+♻️ If course upload or schema logic is already modularized, reuse components.
+
+🧼 Avoid form duplication: use same UI as upload for consistency and less technical debt.
+

@@ -1,0 +1,90 @@
+🧨 NEW FEATURE: Dispatch Deletion + History & System-wide Disable State
+🎯 Objective
+Enable admins to delete (or disable) dispatches from the /dispatches page. Deleted dispatches must:
+
+Be visibly removed from active use
+
+Still show in the company’s dispatch history
+
+Retain all associated stats (users completed, launch count, etc.)
+
+Affect all parts of the app where dispatches are used — systematically synced
+
+✅ TASK CHECKLIST
+1. Update Dispatch Data Model
+Modify the Dispatch model in schema.ts to include:
+
+ts
+Copy
+Edit
+isDisabled boolean DEFAULT false
+deletedAt datetime NULL
+2. API Route Update
+Update /api/dispatches/:id:
+
+Add support for DELETE request → soft delete: sets isDisabled = true, deletedAt = now()
+
+Update GET /api/dispatches to filter out disabled dispatches unless ?includeDisabled=true is passed
+
+3. Frontend: Dispatches Page
+In /pages/dispatches.tsx:
+
+Add 3-dot dropdown on each dispatch card:
+
+Edit Dispatch (🔜 future)
+
+Disable Dispatch ✅
+
+When clicked, confirm modal → call DELETE /api/dispatches/:id
+
+On success: update UI to hide that dispatch
+
+4. Frontend: Company Detail Page /admin/companies/[id]
+Expand the Dispatches table to show:
+
+Active/Disabled tag
+
+DeletedAt date if disabled
+
+Disabled dispatches still show, just grayed out or in a separate section
+
+Bonus: Add a toggle to view All | Active Only | Disabled Only
+
+5. System-wide Sync Behavior
+Wherever dispatches are pulled (/dashboard, /courses, /dispatches, /launch/:token, etc.):
+
+Respect isDisabled = true:
+
+⚠️ Prevent launch token from working
+
+Do not allow license completions
+
+Mark dispatch as inactive visually
+
+6. Audit Trail (Later Expansion)
+Keep existing dispatch record for:
+
+Course title
+
+Company name
+
+Date created
+
+Launch count
+
+Unique users
+
+Completion stats
+
+So even if disabled, we still retain all usage logs. (Most of this likely already exists — just keep wiring it through.)
+
+📍Implementation Notes
+Do not hard-delete any dispatch.
+
+DELETE just disables, adds deletedAt, and removes from most active lists.
+
+Update query filters throughout codebase to respect isDisabled status.
+
+Always check if a route/component already exists before adding new logic (per our system discipline).
+
+Use toast notifications for success/error messages.

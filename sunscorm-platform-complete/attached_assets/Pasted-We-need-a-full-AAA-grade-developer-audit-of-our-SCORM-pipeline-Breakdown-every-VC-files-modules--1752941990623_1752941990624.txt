@@ -1,0 +1,51 @@
+We need a full AAA-grade developer audit of our SCORM pipeline. Breakdown every VC: files, modules, routes, services, UI components, interactions, functions, duplicates, missing validation.
+
+Phase 1 – Map Everything:
+
+Walk through all backend SCORM-related files (uploads, validators, services, dispatch, launch, preview routes, templates).
+
+Identify existing validation, ZIP builds, loader HTML, dispatch logic, launch endpoints.
+
+Detail client-side flow: upload UI, preview component, dispatch UI, loader, SCORM-player behaviors.
+
+Note duplications, missing logic, outdated patterns, inconsistent modularity.
+
+Phase 2 – Propose Refactoring:
+
+For upload/validation: replace validateSCORMPackage/validateSCORMManifest and regex/XML logic with node-sco-parser for manifest validation.
+
+Replace scormValidator + scormService parsing duplication.
+
+Integrate scorm-again in loader and launch templates: include <script src="scorm-again.js">, setup window.API or window.API_1484_11, configure lmsCommitUrl, autocommit, sequencing.
+
+Overhaul /launch/:token route to serve a proper SCORM frameset using scorm-again, not JSON payload.
+
+Phase 3 – Validate UI/UX & Routing:
+
+Standardize UI: remove duplicated headers, consistently label pages (e.g. ‘Companies’) across all pages/routes.
+
+In the courses section, add a ‘Delete’ action in the three-dot menu that removes the course package but retains historical dispatch records for companies.
+
+Ensure SCORM upload UI has full feedback, validates file size/types before sending.
+
+Add preview/test player pages to test SCORM is working before dispatch.
+
+Phase 4 – Modular Cleanup & Safety Checks:
+
+Modularize routes: upload.ts, dispatch.ts, launch.ts, preview.ts with middleware.
+
+Add unit tests for scorm validation, dispatch ZIP builder, and launch process.
+
+Remove legacy files (routes-old.ts, duplicate validators).
+
+Add edge-case handlers and error pages (e.g. invalid token, missing manifest, oversized upload).
+
+Phase 5 – Deliverables:
+
+CSV-style audit file listing every SCORM-related file and function.
+
+Action list mapping each file to fix-instruction: “Replace this with node-sco-parser” etc.
+
+Implementation plan for phased refactor.
+
+Start with Phase 1 audit. Break everything down granularly. Once I see the audit, I’ll review and we move to replace/cleanup.”

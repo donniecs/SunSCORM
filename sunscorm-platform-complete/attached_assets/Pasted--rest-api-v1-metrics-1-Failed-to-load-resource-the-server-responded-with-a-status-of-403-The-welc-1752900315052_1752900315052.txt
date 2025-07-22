@@ -1,0 +1,106 @@
+/rest-api/v1/metrics:1  Failed to load resource: the server responded with a status of 403 (The welcome questions are not answered)
+/rest-api/v1/users/me/integrations:1  Failed to load resource: the server responded with a status of 403 (The welcome questions are not answered)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/users/me/unread:1  Failed to load resource: the server responded with a status of 403 (The welcome questions are not answered)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/users/me/statistics:1  Failed to load resource: the server responded with a status of 403 (The welcome questions are not answered)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+frame-modern.34405e0d.js:1 [Intercom] The App ID in your code snippet has not been set. Set it to your App ID found in settings to complete installation: https://app.intercom.com/a/apps/_/settings/web
+i @ frame-modern.34405e0d.js:1
+frame-modern.34405e0d.js:1 [Intercom] Launcher is disabled in settings or current page does not match display conditions
+/rest-api/v1/gamification/settings:1  Failed to load resource: the server responded with a status of 403 (The welcome questions are not answered)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/skills/settings:1  Failed to load resource: the server responded with a status of 403 (The welcome questions are not answered)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/skills/settings:1  Failed to load resource: the server responded with a status of 403 (The welcome questions are not answered)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/users/me/integrations:1  Failed to load resource: the server responded with a status of 403 (The welcome questions are not answered)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/users/me/statistics:1  Failed to load resource: the server responded with a status of 403 (The welcome questions are not answered)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/users/me/unread:1  Failed to load resource: the server responded with a status of 403 (The welcome questions are not answered)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/gamification/settings:1  Failed to load resource: the server responded with a status of 403 (The welcome questions are not answered)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+api-iam.intercom.io/messenger/web/metrics:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+api-iam.intercom.io/messenger/web/metrics:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+api-iam.intercom.io/messenger/web/metrics:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+api-iam.intercom.io/messenger/web/metrics:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+api-iam.intercom.io/messenger/web/metrics:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+/rest-api/v1/reverse-trial/stats:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/courses/126:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/users/me/courses?filter[progress_status][in]=not_attempted,incomplete:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/users/me/courses/by-categories?page[number]=1&page[size]=500&sort=name:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+/rest-api/v1/users/me/categories?flat=false:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/reverse-trial/stats:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+scorm_loaderV2.html:43 Uncaught TypeError: Cannot read properties of undefined (reading 'launch_url')
+    at receiveMessage (scorm_loaderV2.html:43:29)
+scorm_loaderV2.html:43 Uncaught TypeError: Cannot read properties of undefined (reading 'launch_url')
+    at receiveMessage (scorm_loaderV2.html:43:29)
+scorm_loaderV2.html:80 -2.
+d2672687-6b19-43f5-82fe-17c42eb622f1:1  Failed to load resource: the server responded with a status of 404 ()

@@ -1,0 +1,92 @@
+Here’s your next prompt — scoped and styled like a senior dev lead running a high-level QA review of the newly implemented **Company Profile Page**. This prompt ensures we test every **button, interaction, and data-driven function**, with detailed verification logic, expected outcomes, and reminders to check for false-positives or unlinked behaviors.
+
+---
+
+### ✅ CLAUDE TASK: Functional QA Test for All Buttons on Company Detail Page
+
+🎯 **Objective:**
+Perform a full validation of **every interactive element** on `/admin/companies/[companyId]` to ensure new features (e.g., dispatch rendering, course data, launch file download) work end-to-end without any disconnected logic, broken handlers, or empty callbacks.
+
+---
+
+### 🧪 Step-by-Step Test Checklist
+
+You are performing manual QA **as a lead frontend+backend engineer** reviewing a production-bound PR.
+
+#### 🟢 1. **Back Button ("← Back to Companies")**
+
+* ✅ Should use `router.push('/admin/companies')`
+* 🔍 Confirm that clicking this:
+
+  * Navigates instantly without page reload
+  * Returns to the exact companies listing page
+  * Scrolls to top (if needed)
+
+#### 🟢 2. **Download Launch File Button**
+
+* ✅ Must be wired to generate a **real** launch URL from a dispatch
+* 🔍 Confirm that clicking it:
+
+  * Triggers a download of a `.html` or `.zip` or similar SCORM file
+  * File is not empty (check payload, headers, or console logs)
+  * No CORS, permission, or token errors
+* 🧠 *Expected Path*: `/api/dispatches/:dispatchId/launch-file` or similar
+
+#### 🟢 3. **Dispatch Table Status Buttons**
+
+* ✅ Each `active` badge should reflect correct dispatch status from backend
+* 🔍 Confirm:
+
+  * Badge color matches system standard (`active`, `expired`, etc.)
+  * If these become clickable later, confirm tooltips or modal behavior
+
+#### 🟢 4. **Assigned Course Cards**
+
+* 🔍 Confirm for each card:
+
+  * Title matches real course title (cross-ref with `/api/courses`)
+  * Assigned date = dispatch.createdAt
+  * Expiration = dispatch.expiresAt (or "Never" if null)
+  * Max Users = dispatch.maxUsers (or "Unlimited")
+* 🧠 These cards should not display if no matching dispatches found
+
+---
+
+### 🧪 Additional QA Validations (Required)
+
+#### ✅ Confirm Data Source Mapping:
+
+* Company Name, ID, CreatedAt = `/api/tenants/:id`
+* Dispatch list = `/api/dispatches?tenantId=...`
+* Course titles = `/api/courses`
+
+#### ❌ Check for Broken Logic:
+
+* Buttons triggering nothing (undefined handlers)
+* Any unhooked data mappings (e.g. placeholder course names, null dates)
+* Missing loading states (flashing white screens or race conditions)
+
+---
+
+### 🧩 File Ownership:
+
+* Page: `/app/admin/companies/[companyId].tsx`
+* Logic likely also uses:
+
+  * `/lib/api/courses.ts`, `/lib/api/dispatches.ts`, etc.
+
+---
+
+### ✅ Reporting
+
+Log and list all issues found in this format:
+
+```
+❌ [Download Button] – Clicking it downloads an empty file (0 bytes)
+❌ [Back Button] – Navigates to /admin not /admin/companies
+✅ [Course Card] – All data renders accurately for assigned course "asdf"
+```
+
+---
+
+Let me know when this QA pass is complete, and I’ll queue up the **next action prompt**: adding multi-course assignment support and a “remove course from company” toggle.

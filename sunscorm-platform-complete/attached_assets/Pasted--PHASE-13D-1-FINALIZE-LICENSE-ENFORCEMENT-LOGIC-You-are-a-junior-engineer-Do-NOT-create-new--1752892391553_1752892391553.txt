@@ -1,0 +1,74 @@
+🎯 PHASE 13D.1 — FINALIZE LICENSE ENFORCEMENT LOGIC
+
+You are a junior engineer. Do NOT create new paths, controllers, or routers.  
+You will ONLY update the existing SCORM launch logic at `/launch/:token`.
+
+---
+
+### ✅ WHAT TO DO:
+
+🔍 STEP 1: Locate launch route
+- File: `server/routes.ts`
+- Path: `app.get("/launch/:token")`
+- Confirm the logic is routed to an internal function like `handleLaunchRequest(token)`
+
+---
+
+🔁 STEP 2: Implement dispatch enforcement logic
+
+Update the launch handler to include:
+
+1. **Token Lookup**
+   - Look up the token in the `dispatches` table (via `storage.ts` or your data layer)
+   - If token not found → return `404 Invalid Token`
+
+2. **Expiration Check**
+   - If `dispatch.expiresAt` is in the past → return `403 Expired Dispatch`
+
+3. **Max User Check**
+   - Count entries in `DispatchUser` where `dispatchId = this dispatch`
+   - If `dispatch.maxUsers` is set and already hit → return `403 Max Users Reached`
+
+4. **Unique Launch Per User**
+   - Check if current user already has `DispatchUser` record for this dispatch
+   - If not, create it with:
+     - `userId`
+     - `dispatchId`
+     - `launchedAt = now`
+
+---
+
+✅ STEP 3: Return launch response
+
+- If valid: return the SCORM course file path or HTML player redirect
+- If invalid: return clear error messages, never crash silently
+
+---
+
+🛠️ RULES:
+- Use existing DB queries from `storage.ts` or wherever available
+- DO NOT write new API routes — all logic stays in existing launch path
+- DO NOT use console.log-only “success” messages — all flow must reflect real DB changes
+- Wrap all new logic in `try/catch` with clean error messages
+
+---
+
+✅ OUTPUT I EXPECT FROM YOU:
+
+📦 /launch/:token License Enforcement Summary:
+
+Found launch handler in routes.ts
+
+Checked for dispatch expiration ✅
+
+Checked for max users ✅
+
+Logged user to DispatchUser ✅
+
+Returned valid SCORM launch for token ✅
+
+css
+Copy
+Edit
+
+Do NOT proceed to generating launch HTML or UI changes. Wait for review.

@@ -1,0 +1,114 @@
+Based on everything we now know — from the security hardening ✅ to the dispatch audit ✅ to the QA review ✅ — here is the **most important next step** to get your platform fully up and running for *real-world external LMS testing*:
+
+---
+
+## 🔑 NEXT STEP: **Generate `launch.html` Files Per Dispatch for LMS Upload**
+
+### 🎯 WHY THIS IS MISSION-CRITICAL:
+
+This is the **final handoff file** you upload into external LMS platforms like **TalentLMS**, **Docebo**, **Cornerstone**, etc.
+
+Without it, you can’t:
+
+* Test dispatch delivery
+* Validate token flow from an external system
+* Prove SCORM launch + tracking works outside your environment
+
+---
+
+## ✅ ACTIONS NEEDED IN THIS PHASE:
+
+1. When a dispatch is created, generate a `launch.html` file
+2. The HTML will **auto-redirect to** `/launch/:token` on your domain
+3. Save the file to `uploads/launch_links/dispatch-{id}.html`
+4. Offer a **download button** in the admin dashboard
+5. This file is what you upload to **external LMS platforms** as your course
+
+---
+
+## 🧠 COPY/PASTE THIS PROMPT INTO REPLIT AGENT
+
+```
+🎯 PHASE 13D.2 — SCORM Dispatch Export File Generation
+
+Your task is to generate a `launch.html` file for every SCORM dispatch, so it can be uploaded to external LMS systems (like TalentLMS) to trigger the correct SCORM launch flow.
+
+You are a senior engineer. Do NOT scaffold new apps, create random folders, or generate new routing logic. Follow these steps precisely.
+
+---
+
+✅ STEP 1: Locate dispatch creation logic  
+- File: `server/routes.ts` (POST `/api/dispatches`)
+- Confirm where the dispatch object is created
+- After successful creation, generate a file with this structure:
+
+```
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta http-equiv="refresh" content="0; url=https://{PUBLIC_DOMAIN}/launch/{token}" />
+    <title>Loading Course...</title>
+  </head>
+  <body>
+    <p>If you are not redirected, <a href="https://{PUBLIC_DOMAIN}/launch/{token}">click here</a>.</p>
+  </body>
+</html>
+```
+
+Replace `{token}` with the actual dispatch launch token
+Replace `{PUBLIC_DOMAIN}` with `process.env.PUBLIC_DOMAIN` (add it to `.env` if missing)
+
+---
+
+✅ STEP 2: Save the file
+
+* File path: `uploads/launch_links/dispatch-{dispatchId}.html`
+* Create `uploads/launch_links/` directory if it doesn't exist
+* Use `fs.writeFileSync` or equivalent
+* If `uploads/` is already used for SCORMs, this folder can live under it
+
+---
+
+✅ STEP 3: Confirm admin can download the file
+
+* Add a new GET API route: `GET /api/dispatches/:id/launch-file`
+* File: `server/routes.ts`
+* Route should:
+
+  * Validate user is admin
+  * Validate dispatch exists
+  * Read the file and send as `res.download(...)`
+
+---
+
+📋 Final output should include:
+
+* Launch HTML file saved with correct dispatch token
+* New GET route for downloading the launch file
+* Summary of where you inserted logic and what was created
+
+---
+
+🛑 DO NOT:
+
+* Generate frontend buttons
+* Scaffold a UI
+* Modify unrelated routes
+* Use placeholder tokens or fake IDs — use the real dispatch data
+
+Wait for review before proceeding to UI download button or LMS upload tests.
+
+```
+
+---
+
+Once this runs and we have a working downloadable `launch.html`, you’ll be able to:
+
+✅ Upload it into TalentLMS  
+✅ Trigger a real SCORM launch  
+✅ Begin external validation  
+
+Let me know when it's done and I’ll prep the follow-up prompt to wire the **admin download button** for this file.
+```

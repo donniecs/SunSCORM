@@ -1,0 +1,100 @@
+Got it — this whole breakdown needs to be fixed and systematically hardened. Let’s walk the Replit Agent through the **precise fix path** for the missing company selection during dispatch creation (which caused `400 "Tenant not found"`), and also **enforce system-wide discipline** for future-proofing dispatch behavior.
+
+---
+
+## 🛠️ PROMPT FOR REPLIT AGENT — FIX DISPATCH CREATION + ENFORCE TENANT CONTEXT
+
+### 🔧 CONTEXT
+
+Dispatches are **always created for a specific company (tenant)**. But right now, the `Create Dispatch` modal is **missing the tenant selector field**, which leads to backend errors like:
+
+```json
+400 { "message": "Tenant not found" }
+```
+
+This breaks the core flow. We need to **restore the tenant selection**, validate that it’s **required**, and **pass the correct tenantId** to the backend on submit.
+
+---
+
+### ✅ PRIMARY OBJECTIVE
+
+Update the **Create Dispatch** modal and logic so that:
+
+* ✅ A company (tenant) must be selected before creating a dispatch
+* ✅ The tenant ID is properly sent to `/api/dispatches`
+* ✅ Error handling is improved (show helpful message if tenant is missing)
+* ✅ Any removed logic is restored (like pre-populating tenant list in dropdown)
+
+---
+
+### 📍 FILE & ROUTE TARGETS
+
+#### 1. `client/src/pages/dispatches.tsx`
+
+* Confirm this is the file where `<CreateDispatchModal />` is called.
+* Ensure correct props are passed if tenant ID is scoped earlier (e.g. from company view).
+
+#### 2. `client/src/components/dispatches/create-dispatch.tsx`
+
+* 🧠 **Add a new dropdown** for Tenant/Company selection
+
+  * Fetch tenants via `/api/tenants`
+  * Display `name` but submit `id`
+* 🧠 Update form validation: Make `tenantId` required
+* 🧠 Submit form payload with all required fields:
+
+  ```ts
+  {
+    name,
+    courseId,
+    tenantId,
+    maxUsers,
+    maxCompletions,
+    expiresAt
+  }
+  ```
+* 🧠 Add a clear error toast if `tenantId` is missing or API fails
+
+#### 3. `server/routes/dispatches.ts`
+
+* ✅ Already validates `tenantId`, which is good.
+* 🔍 Confirm `findActiveDispatch()` logic works correctly when `tenantId` is now properly passed.
+
+---
+
+### 🧩 UX LOGIC CONSIDERATIONS
+
+* If coming **from a specific company page**, you may want to preselect the tenant in the dropdown.
+* If coming from global dispatch page, tenant field must be **mandatory and visible**.
+* Add a comment: `// Dispatches must always be scoped to a tenant.`
+
+---
+
+### 🔁 SYSTEM-WIDE INTEGRITY HOOK
+
+✅ After fix is applied:
+
+* 🔍 **Check all references to Create Dispatch modal** — make sure nothing bypasses the tenant requirement.
+* 🔍 Confirm new dispatches **appear correctly under their companies** in `/admin/companies/[id].tsx`
+* 🔍 Confirm all analytics, dashboard stats, and audit trails link back to the right tenant.
+
+---
+
+### 💬 TOAST/ERROR MESSAGE
+
+```ts
+toast.error("You must select a company before creating a dispatch.")
+```
+
+---
+
+### 🔒 FUTURE PREVENTION
+
+As a discipline rule, **no dispatch should exist without a tenant.** Enforce this with:
+
+* Required field in frontend form
+* Required validation in backend API
+* Filtering logic everywhere to group dispatches by tenant
+
+---
+

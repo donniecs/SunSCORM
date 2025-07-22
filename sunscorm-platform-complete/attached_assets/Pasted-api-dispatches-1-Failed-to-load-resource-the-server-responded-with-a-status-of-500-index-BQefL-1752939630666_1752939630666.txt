@@ -1,0 +1,34 @@
+api/dispatches:1  Failed to load resource: the server responded with a status of 500 ()
+index-BQefLCCL.js:48 [API Error]: 500 Internal Server Error
+$x @ index-BQefLCCL.js:48
+index-BQefLCCL.js:48 [API Error URL]: https://sun-scorm-manager-dscalessa1010.replit.app/api/dispatches
+$x @ index-BQefLCCL.js:48
+api/courses:1  Failed to load resource: the server responded with a status of 500 ()
+index-BQefLCCL.js:48 [API Error]: 500 Internal Server Error
+$x @ index-BQefLCCL.js:48
+index-BQefLCCL.js:48 [API Error URL]: https://sun-scorm-manager-dscalessa1010.replit.app/api/courses
+$x @ index-BQefLCCL.js:48
+index-BQefLCCL.js:347 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ index-BQefLCCL.js:347
+api/courses/check-conflicts/tes:1  Failed to load resource: the server responded with a status of 500 ()
+index-BQefLCCL.js:48 [API Error]: 500 Internal Server Error
+$x @ index-BQefLCCL.js:48
+index-BQefLCCL.js:48 [API Error URL]: https://sun-scorm-manager-dscalessa1010.replit.app/api/courses/check-conflicts/tes
+$x @ index-BQefLCCL.js:48
+api/courses/check-conflicts/test:1  Failed to load resource: the server responded with a status of 500 ()
+index-BQefLCCL.js:48 [API Error]: 500 Internal Server Error
+$x @ index-BQefLCCL.js:48
+index-BQefLCCL.js:48 [API Error URL]: https://sun-scorm-manager-dscalessa1010.replit.app/api/courses/check-conflicts/test
+$x @ index-BQefLCCL.js:48
+api/courses/check-conflicts/test3:1  Failed to load resource: the server responded with a status of 500 ()
+index-BQefLCCL.js:48 [API Error]: 500 Internal Server Error
+$x @ index-BQefLCCL.js:48
+index-BQefLCCL.js:48 [API Error URL]: https://sun-scorm-manager-dscalessa1010.replit.app/api/courses/check-conflicts/test3
+$x @ index-BQefLCCL.js:48
+index-BQefLCCL.js:347 Starting chunked upload: cst_358_int_en.zip (232.08 MB) in 24 chunks
+api/csrf-token:1  Failed to load resource: the server responded with a status of 500 ()
+index-BQefLCCL.js:347 Chunked upload failed: SyntaxError: Unexpected token 'I', "Internal S"... is not valid JSON
+uploadFile @ index-BQefLCCL.js:347
+api/csrf-token:1  Failed to load resource: the server responded with a status of 500 ()
+index-BQefLCCL.js:347 Chunked upload error: SyntaxError: Unexpected token 'I', "Internal S"... is not valid JSON
+onError @ index-BQefLCCL.js:347

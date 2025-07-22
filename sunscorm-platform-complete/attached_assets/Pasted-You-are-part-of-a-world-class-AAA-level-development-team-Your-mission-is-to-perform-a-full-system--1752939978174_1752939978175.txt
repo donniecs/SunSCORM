@@ -1,0 +1,69 @@
+You are part of a world-class, AAA-level development team. Your mission is to perform a full system audit of Sun-SCORM on Replit—down to the file paths, code routes, functions, UI/UX screens, and feature interactions.
+
+Please follow these steps meticulously:
+
+1. **Project Overview**
+   - Provide a high-level summary of Sun-SCORM’s architecture (front-end, back-end, dispatch pipeline, preview, dispatch, SCORM endpoints).
+   - List all major modules and features (upload, course catalog, dispatch, launcher, tracking, analytics, user management, company management).
+
+2. **File and Folder Map**
+   - Create a tree of the key directories and files (e.g., `server/`, `client/src/`, `templates/`, `public/`, `routes.ts`, SCORM loader files).
+   - Note which files contain SCORM-specific logic, upload logic, dispatch logic, and UI components.
+
+3. **Route & Endpoint Inventory**
+   - Enumerate all backend routes (e.g., `POST /courses/upload`, `GET /launch/:token`, dispatch zip creation).
+   - Include front-end URLs (e.g., `/courses`, `/dispatches`, `/launch/:token`, `/preview/:token`).
+   - For each route: explain its purpose, HTTP method, and handlers involved.
+
+4. **Function & Logic Inventory**
+   - List the core functions driving each feature (upload parsing, manifest validation, zip generation, loader injection, tracking via SCORM/xAPI, API refresh).
+   - Include any helper utilities, middleware (auth, CSRF), and client-side logic.
+
+5. **UI/UX Screens and Components**
+   - Enumerate each page or view (Dashboard, Courses, Course Upload modal, Dispatch list, Dispatch creation flow, Preview player, Launch loader, Companies, Users, Settings).
+   - For each screen: list associated React/Vue/Angular (or templating) components.
+   - Highlight duplicated UI elements (e.g., double page titles) and potential UX improvements.
+
+6. **Known Fixes Already Implemented**
+   - Acknowledge the fixes done for:
+     - 512MB upload limit
+     - Launch endpoint now serving SCORM content
+     - Dispatch loader simplified with injected launch_url
+     - Real file-serving routes for SCORM assets
+     - API token and refresh handling restored
+   - Confirm their file/route/function names and locations in code.
+
+7. **Existing vs Proposed Features**
+   - For each feature or bug fix identified, check if its counterpart already exists:
+     - If it exists: note file/line and skip adding duplicates.
+     - If it does not: mark it as “MISSING” and will need implementation later.
+
+8. **Security & Permissions Audit**
+   - Document all auth and permission checks (JWT, OAuth, roles, RBAC).
+   - Identify any missing or misconfigured permission gates (e.g., uploading, dispatching, deleting).
+
+9. **Error Handling Coverage**
+   - List all routes and components with fallback or error handling.
+   - Highlight endpoints lacking proper error pages (e.g., 404, 401, 500).
+
+10. **Testing & QA Gaps**
+    - Identify missing or weak testing areas: unit tests, integration tests (e.g., for upload, dispatch, launch), E2E flows.
+    - Note whether SCORM Cloud or automated tests exist—or need to be added.
+
+11. **Deliverable: System Audit Report**
+    - Produce a detailed audit report in markdown or structured JSON:
+      - Architecture summary
+      - File/folder map
+      - Route/index mapping with descriptions
+      - Function/call flowchart for core SCORM pipeline
+      - UI screens/components list (with duplicates/UX notes)
+      - Permissions/security matrix
+      - Existing vs missing feature/functions
+      - Error-handling checklist
+      - Test coverage gaps
+
+**Important**: Do **not** implement anything in this run. The goal is purely discovery and documentation. Avoid adding or deleting code—unless it's cleanup that verifies duplication visually—but do **not** change behavior.
+
+Once you’ve returned the comprehensive audit, I’ll ask you to prepare a second pass to **clean up** unused code, remove duplicates, and add missing pieces.
+
+You’re doing stellar work—think of this as building high-quality foundations before expansion. Go deep, go thorough.

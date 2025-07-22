@@ -1,0 +1,99 @@
+🧠 Root Cause (Why It’s Still Failing)
+Despite injecting the correct deployed URL, you’re still seeing:
+
+mathematica
+Copy
+Edit
+Invalid launch URL detected
+{ "message": "Invalid Token" }
+That means the launch file was successfully embedded into the LMS and attempted to hit your deployed /launch/:token route — but:
+
+🔥 The token no longer exists or was never correctly registered.
+Most likely because:
+
+⚠️ The dispatch entry was created during preview mode, not production — and tokens generated then were not synced after deployment
+
+⚠️ The /launch/:token route in production is rejecting it because it doesn’t match anything in your live database
+
+⚠️ The ZIP still contains an outdated launch_url pointing to a token that isn’t active or was generated from a dev server run
+
+🛠️ Fix: Full Production-Synced Dispatch Flow
+Let’s walk Claude through exactly what must happen to repair this — permanently. Use the following detailed scoped prompt:
+
+✅ Claude Prompt (SCORM Dispatch Fix — Final Production Sync)
+📂 PATH CONTEXT
+
+Loader Template: /server/templates/scorm-loader.html
+
+SCORM ZIP Generator: /server/routes.ts → inside res.download(...) logic for dispatch route
+
+Token Generation: /server/controllers/dispatchController.ts
+
+Launch Route: /server/routes/launch.ts
+
+Env: .env should contain BASE_URL=https://sun-scorm-manager-dscalessa1010.replit.app
+
+🧭 TASK OBJECTIVE
+Ensure all future SCORM dispatch ZIPs contain a valid, working launch_url that:
+
+Uses the deployed production domain (.replit.app)
+
+Points to an active, valid launch token
+
+Loads and plays the SCORM course in LMS environments like TalentLMS without failure
+
+📌 FIX THIS SYSTEMATICALLY:
+💾 Inject Real-Time Token at Export
+
+When generating a ZIP for a dispatch, create a new launch token
+
+Save that token to the database as a valid DispatchUser entry (if it isn’t already created)
+
+Inject it into the index.html of the loader using:
+
+ts
+Copy
+Edit
+const launchUrl = `${process.env.BASE_URL}/launch/${token}`
+📁 Verify /launch/:token Works in Deployed App
+
+The deployed endpoint must be reachable externally
+
+If the token is valid, it should return the correct SCORM player and assets
+
+🧼 Delete Old scorm_loaderV2.html
+
+It still tries to read launch_url via postMessage — remove it entirely
+
+Replace with scorm-loader.html only (Claude created it already)
+
+✅ Validate Full Dispatch Flow
+
+Trigger a new dispatch via admin UI
+
+Download the ZIP
+
+Upload to TalentLMS
+
+Launch it — verify it works without fallback/manual launch
+
+🧪 Test Plan (Claude Should Do This)
+ ✅ Run npm run start on deployed Replit app
+
+ ✅ From admin panel, dispatch a course to a company
+
+ ✅ Download the new SCORM ZIP
+
+ ✅ Upload it to TalentLMS
+
+ ✅ Verify it launches and plays without fallback message
+
+ ✅ Log any 403 or 404s to troubleshoot token lookups
+
+🎯 Success Criteria
+Check	Result
+ZIP includes deployed launch URL	✅
+Token in URL is valid in production DB	✅
+Loader uses injected launch URL only	✅
+SCORM course plays in LMS	✅
+No fallback/manual trigger needed	✅

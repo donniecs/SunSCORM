@@ -1,0 +1,97 @@
+I need a **complete professional system audit** of this codebase.
+
+🚨 DO NOT modify, add, delete, or scaffold anything. This is a **read-only diagnostic**.
+
+You are acting as a **senior web architecture engineer at a AAA software firm**. Your job is to analyze this repo like it’s an enterprise-grade platform and return a full report covering:
+
+---
+
+### 🗂️ 1. **PROJECT STRUCTURE**
+- List every folder and major file in the project
+- Group by purpose: pages, routes, APIs, components, models, utilities, configs, DB, etc.
+- For each folder, briefly explain its role
+
+---
+
+### 🌐 2. **ROUTE MAP**
+- List ALL active frontend and backend routes:
+  - Public pages (e.g., `/login`, `/menu`, `/admin/dashboard`)
+  - API endpoints (`/api/`, `/auth/`, etc.)
+- For each route, include:
+  - Method (GET, POST, etc.)
+  - File that handles it
+  - Whether it requires auth
+  - Who it’s intended for (admin, staff, customer, external integration)
+
+---
+
+### 🔁 3. **FEATURE FLOW CONNECTIONS**
+Trace these key user flows end-to-end through the system:
+- Admin login → token → admin dashboard
+- Quick DineIN setup → order creation → fulfillment
+- Reservation → seating → table status updates
+- Loyalty program → user tracking → rewards redemption
+
+For each flow, show:
+- Which frontend component/page starts it
+- What backend/API endpoint processes it
+- Which controller or service file handles logic
+- Which DB tables/models are affected
+
+---
+
+### 🧠 4. **DUPLICATES, ORPHANS, DEAD LOGIC**
+Look for and report:
+- Duplicate features (e.g., 2 different login flows or cart systems)
+- Orphaned files not referenced anywhere
+- Test/demo routes or mock data left in production
+- Functions defined but never used
+- Multiple “entry points” or routers
+
+Clearly list:
+- File path
+- Why it’s a problem
+- Suggest to delete, merge, or refactor
+
+---
+
+### 🧭 5. **APP ENTRY POINT & ROUTING LAYERS**
+- What is the app’s main entry file? (e.g., `index.ts`, `main.jsx`)
+- What router handles frontend nav? (e.g., React Router, Wouter)
+- What handles backend API routing? (e.g., Express `app.js`)
+- How are frontend and backend connected?
+
+---
+
+### 🛡️ 6. **AUTHENTICATION & PERMISSIONS OVERVIEW**
+- What auth system is in use? (JWT, sessions, etc.)
+- Where are tokens validated?
+- What routes are protected?
+- Are there any unprotected admin routes?
+
+---
+
+### 🔍 7. **THIRD PARTY INTEGRATIONS**
+- List any integrations found (ToastTab, Resy, Stripe, Firebase, etc.)
+- For each, list:
+  - Which file initializes it
+  - What it connects to
+  - If keys/secrets are handled securely
+
+---
+
+### 🧰 8. **CONFIG & ENVIRONMENT**
+- List `.env` keys used
+- Show where configs are defined or loaded
+- Report any hardcoded secrets or credentials
+
+---
+
+### 📉 9. **RED FLAGS & ARCHITECTURE RISKS**
+If you see anything that might cause bugs, scaling issues, or developer confusion (such as circular imports, implicit magic, etc.), call it out. Be honest and blunt.
+
+---
+
+⚠️ DO NOT FIX ANYTHING.  
+⚠️ DO NOT ASSUME FUNCTIONALITY.  
+Just audit, document, and return a full breakdown. 

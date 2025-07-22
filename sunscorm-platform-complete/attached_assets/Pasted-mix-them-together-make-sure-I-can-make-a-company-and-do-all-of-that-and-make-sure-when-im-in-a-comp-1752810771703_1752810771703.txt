@@ -1,0 +1,55 @@
+mix them together, make sure I can make a company and do all of that and make sure when im in a company and I dispatch that company a course I can chaange it per course! the header is fine for now not worried about that, but this below.
+
+I need to enhance the dispatch creation functionality with additional license enforcement options. Currently, we only have "Max Users" and "Expiration Date" in the Create Dispatch modal, but I need to implement a more comprehensive licensing system.
+
+Please add these additional constraint options:
+1. Maximum Completions - Total number of times a course can be completed across all users
+2. Maximum Unique Users - Similar to current "Max Users" but ensure it's tracking unique individuals
+3. Expiration Date - Already implemented
+
+These constraints should work in ANY combination:
+- Users should be able to enable just one constraint
+- Users should be able to enable any two constraints together
+- Users should be able to enable all three constraints simultaneously
+
+Important implementation requirements:
+1. First check if this functionality already exists partially in the codebase
+2. Update database schema if needed to store these constraints
+3. Modify API endpoints to validate against all constraint types
+4. Update the frontend dispatch creation form
+5. Ensure validation logic checks ALL enabled constraints before allowing access
+6. Update any existing dashboard analytics to reflect these constraints
+
+The changes should be integrated across the entire application flow:
+- Database models
+- API validation middleware
+- Frontend components
+- Analytics tracking
+
+Please ensure the solution is cohesive and not just an isolated feature!
+
+I need to enhance our license enforcement system to work at both the dispatch and company levels. Let me explain the complete requirements:
+
+1. DISPATCH LEVEL ENFORCEMENT:
+   - Add "Maximum Completions" option to the Create Dispatch modal (along with existing Max Users and Expiration Date)
+   - Allow any combination of these three constraints on individual dispatches
+
+2. COMPANY LEVEL ENFORCEMENT (NEW):
+   - Implement the same three enforcement options on the company/tenant level
+   - These settings should be accessible from the Company management page
+   - Company-level enforcement settings MUST OVERRIDE any individual dispatch settings
+
+3. ENFORCEMENT HIERARCHY:
+   - If a company has a limit of 50 completions, it applies across ALL dispatches for that company
+   - If a company has an expiration date of July 1st, ALL dispatches for that company expire on that date regardless of their individual settings
+   - The most restrictive setting from the company level should always take precedence
+
+Please ensure this is fully integrated throughout the system:
+1. Check if parts of this functionality already exist in the codebase
+2. Update database schemas for both dispatches and companies
+3. Modify ALL relevant API endpoints to check company-level constraints first
+4. Update both dispatch creation and company management UI
+5. Ensure validation logic enforces the hierarchy correctly
+6. Update analytics to show limits at both levels
+
+This feature needs complete end-to-end implementation, not just UI changes.

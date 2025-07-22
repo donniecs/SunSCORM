@@ -1,0 +1,70 @@
+frame-modern.34405e0d.js:1 [Intercom] The App ID in your code snippet has not been set. Set it to your App ID found in settings to complete installation: https://app.intercom.com/a/apps/_/settings/web
+i @ frame-modern.34405e0d.js:1
+frame-modern.34405e0d.js:1 [Intercom] Launcher is disabled in settings or current page does not match display conditions
+scorm_loaderV2.html:43 Uncaught TypeError: Cannot read properties of undefined (reading 'launch_url')
+scorm_loaderV2.html:43 Uncaught TypeError: Cannot read properties of undefined (reading 'launch_url')
+ -2.
+ SCORM Loader initialized
+ Launch URL: https://8795ef0e-cc61-4b8d-96e1-337729c77830-00-61jzljkz9awa.janeway.replit.dev/launch/ea321f55-8253-4349-8aa2-16814da99aa1
+ SCORM Loader V2 initialized
+ Launching course: https://8795ef0e-cc61-4b8d-96e1-337729c77830-00-61jzljkz9awa.janeway.replit.dev/launch/ea321f55-8253-4349-8aa2-16814da99aa1
+ Invalid launch URL detected: https://8795ef0e-cc61-4b8d-96e1-337729c77830-00-61jzljkz9awa.janeway.replit.dev/launch/ea321f55-8253-4349-8aa2-16814da99aa1
+launchCourse @ cdn.talentlms.com/su…asdf/index.html:181
+ Fallback triggered: Redirect may have failed, showing manual launch option
+ Page unloading - redirect successful
+/rest-api/v1/users/me/courses?filter[progress_status][in]=not_attempted,incomplete:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+onError @ query.js:358
+l @ retryer.js:67
+(anonymous) @ retryer.js:132
+/rest-api/v1/users/me/categories?flat=false:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+onError @ query.js:358
+l @ retryer.js:67
+(anonymous) @ retryer.js:132
+/rest-api/v1/users/me/courses/by-categories?page[number]=1&page[size]=500&sort=name:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+/rest-api/v1/reverse-trial/stats:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/users/me/courses?filter[progress_status][in]=not_attempted,incomplete:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/users/me/categories?flat=false:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+/rest-api/v1/users/me/courses/by-categories?page[number]=1&page[size]=500&sort=name:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+/rest-api/v1/reverse-trial/stats:1  Failed to load resource: the server responded with a status of 403 (You do not have the required privileges to perform this action)
+console.js:36 Error: Request failed with status code 403
+    at createError (createError.js:16:15)
+    at settle (settle.js:17:12)
+    at XMLHttpRequest.x (xhr.js:66:7)
+(anonymous) @ console.js:36
+scorm_loaderV2.html:43 Uncaught TypeError: Cannot read properties of undefined (reading 'launch_url')
+    at receiveMessage (scorm_loaderV2.html:43:29)
+scorm_loaderV2.html:43 Uncaught TypeError: Cannot read properties of undefined (reading 'launch_url')
+    at receiveMessage (scorm_loaderV2.html:43:29)
+scorm_loaderV2.html:80 -2.
+index.html:148 SCORM Loader initialized
+index.html:149 Launch URL: https://sun-scorm-manager-dscalessa1010.replit.app/launch/d5713e8d-39f0-4ccb-9b03-0d7cb4749ef3
+index.html:207 SCORM Loader V2 initialized
+index.html:177 Launching course: https://sun-scorm-manager-dscalessa1010.replit.app/launch/d5713e8d-39f0-4ccb-9b03-0d7cb4749ef3
+index.html:181 Invalid launch URL detected: https://sun-scorm-manager-dscalessa1010.replit.app/launch/d5713e8d-39f0-4ccb-9b03-0d7cb4749ef3
+launchCourse @ index.html:181
+index.html:246 Fallback triggered: Redirect may have failed, showing manual launch option

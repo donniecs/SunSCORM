@@ -1,0 +1,53 @@
+You are the lead developer on Sun SCORM, and I need a meticulous, end‑to‑end system audit—think of your work as being reviewed by a billion‑dollar tech company code‑audit team. I want comprehensive mapping and breakdown of **everything** related to SCORM functionality: uploads, catalog, preview, dispatch, export, launch, loader, tracking, cleaning up old code paths, UI/UX, routes, middleware, validation, storage, etc. 
+
+Please follow this structured approach:
+
+1. **📂 Discover & List All SCORM‑Related Files/Folders**
+   - Identify all files under `/server`, `/templates`, `/client`, routes like `/api/courses`, `/api/dispatches`, `/launch`, loaders (`scorm_loader.html`, `scorm_loaderV2.html`, `index.html` templates), upload handlers, middleware, static asset paths.
+
+2. **🔁 Map Route Handlers & Middleware**
+   - For each route (e.g. `POST /api/courses/upload`, `POST /api/dispatches`, `GET /launch/:token`, static loaders):
+     - Document path, HTTP method, purpose, entry point file, downstream calls (e.g. storage, ZIP creation, manifest parsing, token generation).
+     - Note authentication, validation, file‑size limits, duplicate prevention logic.
+
+3. **🧭 Trace Full SCORM Flow**
+   - **Upload**: SCORM ZIP upload endpoint → unzip/validate manifest → store assets.
+   - **Preview**: Catalog page preview → loaders serve SCORM content.
+   - **Dispatch**: Dispatch creation → ZIP generation logic → link URL injection.
+   - **Export**: Download dispatch ZIP → structure and loader template inside ZIP.
+   - **Launch**: `GET /launch/:token` route → should serve HTML + assets + SCORM‑API-enabled proxy logic.
+   - **Tracking**: Injection of SCORM JS API or xAPI, proxy endpoints to communicate with external LMS back to Sun API.
+
+4. **🧱 Identify Legacy/Partial Implementations**
+   - Locate old `scorm_loaderV2.html` or postMessage code.
+   - Find both old and new routes that serve SCORM—highlight overlaps or dead code.
+   - Check for unsupported patterns: JSON responses in `launch/:token`, missing asset routing, missing authentication logic.
+
+5. **🧑‍💻 UI/UX Audit Checklist**
+   - Catalog & Dispatch pages: ensure “3‑dot” menus have **Delete**, **Edit**, **View**.
+   - Ensure delete is **soft delete**, preserves history, and disables dispatching/courses globally.
+   - Global scorm catalog: course upload, preview, dispatch, delete — all accessible.
+   - No duplicate headers or hidden elements — ensure each page’s UI is clean, consistent, labeled.
+
+6. **🛡 Systematic Duplicate & Feature‑Check Logic**
+   - Wherever adding a function (upload, dispatch, delete), check:
+     - Is there an existing route/component? Don’t reinvent—extend.
+     - Is UI/UX consistent? Confirm menus and buttons across pages.
+     - Does it link through API properly (auth, CSRF, limits)?
+     - Does disabling a course/dispatch propagate everywhere (catalog, dispatch list, company profile, analytics)?
+  
+7. **🗺 Create Full System Map**
+   - Provide either a markdown table or JSON of:
+     - File → associated routes & functionality
+     - Route → handler, key logic, reliant files
+     - UI component → pages, buttons, state transitions
+
+8. **🧹 Flag Gaps & Recommendations**
+   - Highlight missing features (e.g., no delete button on SCORM catalog).
+   - Spot inconsistencies (e.g., loader still relying on postMessage).
+   - Propose cleanup: remove old loaders, merge duplicate code, fix route returns (serve HTML not JSON).
+   - Confirm CORS/auth/CSRF, file‑size limit settings, extensible error handling.
+
+🧠 **After this audit**, return the full mapping and flagged issues. Then I’ll ask you for the next “clean‑up prompt” to systematically refactor, fix, and enhance based on your findings.
+
+**Important:** Don’t implement changes now—this is an audit. Be exhaustive and granular. Provide code references and clear next steps.

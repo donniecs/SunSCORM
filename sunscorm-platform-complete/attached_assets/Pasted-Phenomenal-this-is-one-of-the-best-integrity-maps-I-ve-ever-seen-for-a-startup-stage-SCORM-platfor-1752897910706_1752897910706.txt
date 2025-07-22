@@ -1,0 +1,114 @@
+Phenomenal — this is one of the best integrity maps I’ve ever seen for a startup-stage SCORM platform.
+
+Now that we have the **full system walkthrough output**, here's what to do next — this prompt will **walk the Replit Agent through fixing the exact weak points**.
+
+---
+
+## 📦 PROMPT: PATCH ALL SYSTEM FRAGILITY POINTS
+
+### Title: 🔧 Patch Known Integration Gaps Across Dispatch, Search, and xAPI
+
+Send this as-is to the Agent:
+
+---
+
+### 📜 TASK: Patch All Identified System Integration Weak Points
+
+You've just completed a system-wide integrity scan. Based on that, here are **four targeted patches** to fully tighten up the app.
+
+---
+
+### 🔐 1. Fix Launch Token Bypass (MEDIUM)
+
+**File**: `server/routes.ts` (`/launch/:token` route)
+
+**Problem**: Old tokens can launch disabled dispatches.
+
+**Fix**:
+
+* After extracting the dispatch from the token, add:
+
+```ts
+if (dispatch.isDisabled) {
+  return res.status(403).json({ message: 'This course is no longer available.' });
+}
+```
+
+**Rationale**: Tokens must respect dispatch disablement — launching a disabled course undermines license integrity.
+
+---
+
+### 🔎 2. Fix Global Search to Exclude Disabled Dispatches (MEDIUM)
+
+**File**: `client/src/components/layout/global-search.tsx`
+
+**Problem**: May return disabled content.
+
+**Fix**:
+
+* Wherever search is performed, make sure the query includes:
+
+```ts
+?includeDisabled=false
+```
+
+* And if it hits the backend, apply `isDisabled: false` as a filter in the query.
+
+**Rationale**: We never want users seeing or navigating into dead/archived dispatches.
+
+---
+
+### 📤 3. Improve Course Upload: Add Conflict Preview (LOW)
+
+**File**: `client/src/components/courses/course-upload.tsx`
+
+**Problem**: Users can upload a course and not realize it conflicts with existing dispatches when assigning.
+
+**Fix**:
+
+* After upload, before final save, call `findActiveDispatch()` for that course ID.
+* If it returns a result, show a warning like:
+
+> “This course is already assigned to \[Company Name]. Upload will succeed, but assignment may fail.”
+
+**Optional**: Auto-check existing dispatches before allowing course re-upload.
+
+---
+
+### 📡 4. Patch xAPI Endpoint to Validate License (LOW)
+
+**File**: `server/routes.ts` (`/api/xapi/statements`)
+
+**Problem**: xAPI statement could be posted for a disabled/expired dispatch.
+
+**Fix**:
+
+* Before accepting a statement, do:
+
+```ts
+const dispatch = await getDispatchByToken(req.body.token);
+if (!dispatch || dispatch.isDisabled) {
+  return res.status(403).json({ message: 'Invalid or inactive dispatch.' });
+}
+```
+
+**Optional**: Later we can expand to check if the user exceeded max launches, etc.
+
+---
+
+### 🧪 Final Step: Re-test the Entire Dispatch Flow
+
+Once those patches are in, re-test the following:
+
+* Assigning a course → disable → reassign → launch (should block launch)
+* Global search (should omit disabled)
+* Course upload (should show conflict warning)
+* Post xAPI with old token (should be blocked)
+
+---
+
+## ✅ Result
+
+These changes bring the system to full architectural integrity and license compliance — locking down all remaining edge-case bypasses.
+
+Let me know when the Agent finishes this patch, and I’ll help QA test or write cleanup prompts.

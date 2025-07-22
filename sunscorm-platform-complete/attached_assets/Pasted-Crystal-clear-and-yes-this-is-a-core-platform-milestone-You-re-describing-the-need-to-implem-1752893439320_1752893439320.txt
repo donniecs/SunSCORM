@@ -1,0 +1,127 @@
+Crystal clear — and yes, this is a **core platform milestone.** You're describing the need to implement **course-to-company assignment** (dispatch provisioning) via a **multi-course selection interface**, with full company-specific visibility.
+
+You're about to build what SCORM Cloud calls a **“course license relationship manager.”**
+
+---
+
+## 🎯 GOAL: Assign Courses to a Company (via Dispatches)
+
+> So admins can:
+
+* Select multiple courses
+* Assign them to a company
+* Define limits (max users, expiration)
+* View all dispatches per company in the org dashboard
+
+---
+
+## ✅ You already have:
+
+* Courses uploaded and listed
+* Tenants (companies) created
+* Dispatch creation logic
+* License fields per dispatch
+* Admin UI with both `/courses` and `/companies` pages
+
+---
+
+## 🔧 WHAT NEEDS TO BE BUILT NEXT (Architected Plan)
+
+### ✅ PHASE 13D.3 – Course Assignment Flow via Dispatch
+
+---
+
+### 👷 BACKEND WORK (if needed — Agent will confirm first):
+
+We may already have:
+
+* `POST /api/dispatches` – accepts courseId + tenantId
+* `GET /api/dispatches?tenantId=X` – may exist, or we create it
+* All schema support for dispatch records
+
+So most work will be **UI wiring** — not new backend.
+
+---
+
+## 🧠 COPY/PASTE THIS PROMPT INTO REPLIT AGENT:
+
+```
+🎯 PHASE 13D.3 – Course-to-Company Assignment Flow (Dispatch Provisioning)
+
+You are a senior engineer finalizing the enterprise SCORM dispatch system.  
+Your task is to enable admins to assign multiple courses to a specific company (tenant), creating dispatches in bulk via the UI.
+
+---
+
+✅ STEP 1: COURSE SELECTION UI
+
+In the `/courses` page, add:
+- A checkbox next to each course
+- A "Bulk Assign" button at the top or bottom of the course list
+
+On click:
+- Open a modal: "Assign selected courses to a company"
+- Modal includes:
+  - Dropdown to select a company (tenant)
+  - Expiration date field
+  - Max users input
+
+Submit button creates a dispatch for each selected course using:
+- `POST /api/dispatches`
+- Pass: `courseId`, `tenantId`, `expiresAt`, `maxUsers`
+
+✅ IMPORTANT:
+- Do not duplicate any dispatches if they already exist for that course+tenant combo (check before creating)
+- Use TanStack Query mutations if possible
+
+---
+
+✅ STEP 2: VIEW ASSIGNED COURSES PER COMPANY
+
+In the `/companies` page:
+- Make each row (or "View" button) open a Company Detail view or modal
+- This view should list all dispatches for that company:
+  - Course name
+  - Expiration date
+  - Max users
+  - Launch link (optional)
+  - Usage summary (optional for now)
+
+Fetch using:
+- `GET /api/dispatches?tenantId=XYZ` — use this if it exists
+- If not: implement new route in `routes.ts` that filters dispatches by tenant
+
+---
+
+📦 OUTPUT I EXPECT:
+
+```
+
+✅ PHASE 13D.3 COMPLETE:
+
+* \[UI] Checkboxes and Bulk Assign modal added to /courses
+* \[UI] Company view now shows all dispatches per company
+* \[API] Existing POST /api/dispatches used with courseId+tenantId
+* \[Logic] Prevented duplicate dispatches per course+tenant
+* \[UX] Admin can now assign multiple courses to any company easily
+
+```
+
+🛑 DO NOT:
+- Scaffold new pages unnecessarily
+- Create new course or tenant tables
+- Rewrite dispatch logic — just reuse what exists
+
+Wait for review before continuing to launch testing.
+```
+
+---
+
+Once this is working, you’ll be able to:
+
+✅ Assign multiple courses to any tenant
+✅ View a company’s licensed catalog
+✅ Maintain dispatch-level enforcement
+✅ Prep for launch link generation + LMS uploads
+
+Let me know when it’s complete — I’ll guide the follow-up phase: **company dashboard usage analytics + download all launch links.**

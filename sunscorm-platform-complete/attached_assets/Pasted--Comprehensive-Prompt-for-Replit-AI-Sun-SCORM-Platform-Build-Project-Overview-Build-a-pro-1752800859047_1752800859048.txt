@@ -1,0 +1,633 @@
+# Comprehensive Prompt for Replit AI: Sun-SCORM Platform Build
+
+## Project Overview
+
+Build a production-grade SCORM dispatch platform called Sun-SCORM that rivals Rustici's SCORM Cloud. This system allows organizations to upload, manage, and distribute SCORM e-learning content with robust license enforcement, user tracking, and analytics.
+
+## System Architecture
+
+Create a modern web application with the following architecture:
+
+```
+Sun-SCORM/
+├── apps/
+│   ├── frontend/                    # Next.js React application
+│   ├── api-gateway/                 # Express API Gateway service
+│   ├── content-ingestion/           # SCORM upload and validation service
+│   ├── scorm-runtime/               # Course execution environment
+│   ├── dispatch-service/            # License enforcement and package generation
+│   └── analytics/                   # xAPI processing and Metabase integration
+├── packages/
+│   ├── scorm-wrapper/              # SCORM-to-xAPI wrapper
+│   ├── types/                      # Shared TypeScript interfaces
+│   └── utils/                      # Shared utilities (tokens, validation)
+├── prisma/                         # Database schema and migrations
+│   ├── schema.prisma               # Core data models
+│   └── migrations/                 # Database migrations
+└── docker-compose.yml              # Development environment setup
+```
+
+## Core Database Models
+
+Use Prisma with PostgreSQL to implement these key models:
+
+```typescript
+// Key models to implement
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      String   // "admin", "company_admin", "user"
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model Tenant {
+  id                String   @id @default(uuid())
+  name              String
+  domain            String?
+  maxDispatchUsers  Int?     // Global license limit
+  maxCompletions    Int?     // Global completion cap
+  globalExpiration  DateTime?
+  users             User[]
+  courses           Course[]
+  dispatches        Dispatch[]
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  version     String
+  description String?
+  ownerId     String
+  tenantId    String
+  fileCount   Int
+  storagePath String
+  structure   Json     // Course structure from manifest
+  dispatches  Dispatch[]
+}
+
+model Dispatch {
+  id            String   @id @default(uuid())
+  courseId      String
+  tenantId      String
+  maxUsers      Int?     // User cap (null = unlimited)
+  expiresAt     DateTime?
+  course        Course   @relation(fields: [courseId], references: [id])
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  users         DispatchUser[]
+}
+
+model DispatchUser {
+  id          String   @id @default(uuid())
+  dispatchId  String
+  email       String?
+  launchToken String   @unique
+  launchedAt  DateTime?
+  completedAt DateTime?
+  dispatch    Dispatch @relation(fields: [dispatchId], references: [id])
+}
+```
+
+## Frontend Implementation
+
+Create a Next.js application with the following features:
+
+1. **Authentication System**:
+   - Login/register pages with JWT authentication
+   - Role-based access control (admin, company_admin, user)
+   - Session persistence with token refresh
+
+2. **Admin Dashboard**:
+   - Clean, modern UI similar to nexos.ai
+   - Responsive layout with sidebar navigation
+   - Dashboard overview with key metrics
+
+3. **Course Management**:
+   - Course upload interface with drag-and-drop support
+   - Course detail view with structure visualization
+   - Course assignment to companies
+
+4. **Dispatch Management**:
+   - Create dispatch with licensing parameters
+   - Download SCORM package for LMS upload
+   - Monitor usage statistics
+
+5. **Analytics Dashboard**:
+   - Embedded Metabase dashboards
+   - Completion rates and user progress
+   - xAPI statement visualization
+
+## Key Components to Implement
+
+### 1. Authentication System
+
+```typescript
+// Auth context with JWT handling
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Check auth status on load
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+        
+        const response = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user);
+        } else {
+          localStorage.removeItem('authToken');
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
+  // Login, logout, register functions
+  // ...
+};
+```
+
+### 2. Course Upload System
+
+```typescript
+// Course upload component with validation
+export const CourseUpload = () => {
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  
+  const handleUpload = async () => {
+    if (!file) return;
+    
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('course', file);
+    
+    try {
+      const response = await fetch('/api/courses/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Handle successful upload
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+  
+  // Render upload UI
+  // ...
+};
+```
+
+### 3. Dispatch Creation System
+
+```typescript
+// Dispatch creation form
+export const CreateDispatch = () => {
+  const [form, setForm] = useState({
+    courseId: '',
+    tenantId: '',
+    maxUsers: null,
+    expiresAt: null,
+  });
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch('/api/dispatches', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify(form)
+      });
+      
+      if (response.ok) {
+        // Handle success
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      console.error('Failed to create dispatch:', error);
+    }
+  };
+  
+  // Render form
+  // ...
+};
+```
+
+### 4. SCORM Dispatch ZIP Generator
+
+Implement a backend service that:
+1. Retrieves course content
+2. Generates dynamic `imsmanifest.xml`
+3. Injects configuration into launcher HTML
+4. Packages everything as a ZIP file
+
+```typescript
+// Backend dispatch download endpoint
+app.get('/api/v1/dispatches/:dispatchId/download', authenticateJwt, async (req, res) => {
+  try {
+    const { dispatchId } = req.params;
+    const userId = req.user.id;
+    
+    // Check permission
+    const dispatch = await prisma.dispatch.findUnique({
+      where: { id: dispatchId },
+      include: { 
+        course: true,
+        tenant: true 
+      }
+    });
+    
+    if (!dispatch) {
+      return res.status(404).json({ 
+        success: false, 
+        error: { message: 'Dispatch not found' } 
+      });
+    }
+    
+    // Check ownership or admin status
+    if (req.user.tenantId !== dispatch.tenantId && req.user.role !== 'admin') {
+      return res.status(403).json({ 
+        success: false, 
+        error: { message: 'Not authorized to access this dispatch' } 
+      });
+    }
+    
+    // Generate and return ZIP file
+    const zipBuffer = await createDispatchZip(dispatch);
+    
+    // Set headers for download
+    res.set('Content-Type', 'application/zip');
+    res.set('Content-Disposition', `attachment; filename="dispatch-${dispatchId}.zip"`);
+    res.set('Content-Length', zipBuffer.length);
+    
+    res.send(zipBuffer);
+  } catch (error) {
+    console.error('Download error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: { message: 'Failed to generate dispatch package' }
+    });
+  }
+});
+```
+
+### 5. Launch Endpoint with License Validation
+
+```typescript
+// Backend launch endpoint
+app.post('/api/v1/dispatches/:dispatchId/launch', async (req, res) => {
+  try {
+    const { dispatchId } = req.params;
+    const { email } = req.body;
+    
+    // Retrieve dispatch with usage data
+    const dispatch = await prisma.dispatch.findUnique({
+      where: { id: dispatchId },
+      include: {
+        course: true,
+        tenant: true,
+        users: true
+      }
+    });
+    
+    if (!dispatch) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'Dispatch not found' }
+      });
+    }
+    
+    // Check expiration
+    if (dispatch.expiresAt && new Date() > new Date(dispatch.expiresAt)) {
+      return res.status(403).json({
+        success: false,
+        error: { message: 'Dispatch has expired' }
+      });
+    }
+    
+    // Check user limits
+    const launchedUsers = dispatch.users.filter(u => u.launchedAt).length;
+    if (dispatch.maxUsers && launchedUsers >= dispatch.maxUsers) {
+      return res.status(403).json({
+        success: false,
+        error: { message: 'User limit exceeded for this dispatch' }
+      });
+    }
+    
+    // Create launch token
+    const launchToken = uuidv4();
+    
+    // Create dispatch user record
+    await prisma.dispatchUser.create({
+      data: {
+        dispatchId,
+        email,
+        launchToken
+      }
+    });
+    
+    // Generate short-lived JWT for content access
+    const token = generateDispatchToken(dispatchId, dispatch.courseId, email);
+    
+    // Return success with launch data
+    res.json({
+      success: true,
+      data: {
+        authToken: token,
+        launchUrl: `${process.env.RUNTIME_URL}/launch/${launchToken}`,
+        courseInfo: {
+          id: dispatch.course.id,
+          title: dispatch.course.title
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Launch error:', error);
+    res.status(500).json({
+      success: false,
+      error: { message: 'Failed to create launch' }
+    });
+  }
+});
+```
+
+### 6. SCORM Wrapper with xAPI Integration
+
+Create a JavaScript wrapper that:
+1. Implements the SCORM 1.2 API
+2. Converts SCORM calls to xAPI statements
+3. Sends statements to the LRS
+4. Handles completion tracking
+
+```typescript
+// SCORM to xAPI wrapper (simplified)
+window.API = {
+  LMSInitialize: function() {
+    // Initialize SCORM session
+    sendXAPIStatement('initialized');
+    return "true";
+  },
+  
+  LMSSetValue: function(element, value) {
+    // Handle specific SCORM elements
+    if (element === 'cmi.core.lesson_status' && value === 'completed') {
+      sendXAPIStatement('completed', { completion: true });
+    } else if (element === 'cmi.core.score.raw') {
+      sendXAPIStatement('scored', { score: parseFloat(value) });
+    }
+    
+    return "true";
+  },
+  
+  LMSGetValue: function(element) {
+    // Return stored values
+    return storedData[element] || "";
+  },
+  
+  LMSCommit: function() {
+    // Persist data
+    return "true";
+  },
+  
+  LMSFinish: function() {
+    // End session
+    sendXAPIStatement('terminated');
+    return "true";
+  },
+  
+  LMSGetLastError: function() {
+    return "0"; // No error
+  },
+  
+  LMSGetErrorString: function(errorCode) {
+    return "No error";
+  },
+  
+  LMSGetDiagnostic: function(errorCode) {
+    return "No error";
+  }
+};
+
+// Helper function to send xAPI statements
+function sendXAPIStatement(verb, result = {}) {
+  const statement = {
+    actor: {
+      name: config.userName,
+      mbox: `mailto:${config.userEmail}`
+    },
+    verb: {
+      id: `http://adlnet.gov/expapi/verbs/${verb}`,
+      display: { "en-US": verb }
+    },
+    object: {
+      id: `http://example.com/courses/${config.courseId}`,
+      definition: {
+        name: { "en-US": config.courseTitle }
+      }
+    },
+    result: result,
+    context: {
+      registration: config.registrationId,
+      contextActivities: {
+        category: [{
+          id: "https://sunscorm.com/xapi/scorm",
+          definition: {
+            type: "http://adlnet.gov/expapi/activities/profile"
+          }
+        }]
+      }
+    }
+  };
+  
+  // Send to LRS
+  fetch(config.lrsEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${config.token}`
+    },
+    body: JSON.stringify(statement)
+  });
+}
+```
+
+### 7. Analytics Integration
+
+```typescript
+// Metabase embedding component
+export const AnalyticsDashboard = ({ dashboardId, filters }) => {
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const iframeRef = useRef(null);
+  
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const response = await fetch('/api/analytics/embed-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify({ dashboardId, filters })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setToken(data.token);
+        }
+      } catch (error) {
+        console.error('Failed to get embed token:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchToken();
+  }, [dashboardId, filters]);
+  
+  if (loading) {
+    return <div>Loading dashboard...</div>;
+  }
+  
+  if (!token) {
+    return <div>Failed to load dashboard</div>;
+  }
+  
+  const iframeUrl = `${process.env.NEXT_PUBLIC_METABASE_URL}/embed/dashboard/${token}`;
+  
+  return (
+    <div className="w-full h-full min-h-[500px]">
+      <iframe
+        ref={iframeRef}
+        src={iframeUrl}
+        frameBorder="0"
+        width="100%"
+        height="100%"
+        allowTransparency
+      />
+    </div>
+  );
+};
+```
+
+## API Gateway Implementation
+
+Create a central API Gateway that routes requests to the appropriate services:
+
+```typescript
+import express from 'express';
+import cors from 'cors';
+import { authenticateJwt } from './middleware/auth';
+import authRoutes from './routes/auth';
+import courseRoutes from './routes/courses';
+import dispatchRoutes from './routes/dispatches';
+import xapiRoutes from './routes/xapi';
+
+const app = express();
+const PORT = process.env.API_GATEWAY_PORT || 3000;
+
+// Middleware
+app.use(express.json());
+app.use(cors({
+  origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3006'],
+  credentials: true
+}));
+
+// Public routes
+app.use('/auth', authRoutes);
+
+// Protected routes
+app.use('/api/courses', authenticateJwt, courseRoutes);
+app.use('/api/dispatches', authenticateJwt, dispatchRoutes);
+app.use('/api/xapi', authenticateJwt, xapiRoutes);
+
+// Special routes for launch and download
+app.use('/api/v1/dispatches/:dispatchId/download', authenticateJwt, require('./routes/download'));
+app.use('/api/v1/dispatches/:dispatchId/launch', require('./routes/launch'));
+
+app.listen(PORT, () => {
+  console.log(`API Gateway listening on port ${PORT}`);
+});
+```
+
+## UI Design Guidelines
+
+Create a clean, modern UI similar to nexos.ai:
+
+1. **Color Scheme**:
+   - Primary: #3B82F6 (blue)
+   - Secondary: #10B981 (green)
+   - Accent: #8B5CF6 (purple)
+   - Background: #F9FAFB (light gray)
+   - Text: #1F2937 (dark gray)
+
+2. **Layout**:
+   - Sidebar navigation
+   - Clean card-based components
+   - Responsive design for all screen sizes
+   - Consistent padding and spacing
+
+3. **Components**:
+   - Use Shadcn/UI for consistent components
+   - Custom data tables for course and dispatch lists
+   - Interactive charts for analytics
+   - Modal dialogs for forms and confirmations
+
+## Implementation Steps
+
+1. Set up Next.js frontend with Tailwind CSS and Shadcn/UI
+2. Implement API Gateway with Express
+3. Create database schema with Prisma
+4. Implement authentication system
+5. Build course upload and management
+6. Develop dispatch creation and licensing
+7. Create SCORM package generator
+8. Implement launch endpoint with validation
+9. Connect analytics system with xAPI
+10. Add Metabase dashboard embedding
+
+## Testing Requirements
+
+Ensure thorough testing of:
+
+1. Authentication flows
+2. Course upload and validation
+3. Dispatch creation and management
+4. License enforcement (expiration, user caps)
+5. SCORM package generation
+6. Launch process and tracking
+7. Analytics data flow
+
+## Build this system using modern TypeScript, React, and Node.js practices, focusing on clean architecture, type safety, and maintainability.

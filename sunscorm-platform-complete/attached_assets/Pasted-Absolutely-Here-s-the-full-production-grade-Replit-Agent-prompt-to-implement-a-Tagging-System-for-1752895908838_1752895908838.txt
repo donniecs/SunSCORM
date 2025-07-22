@@ -1,0 +1,115 @@
+Absolutely. Here's the full production-grade Replit Agent prompt to implement a **Tagging System for Courses**, tailored like a senior engineer assigning work to a backend/frontend/full-stack dev in a top-tier SaaS company:
+
+---
+
+## 🛠️ REPLIT AGENT PROMPT — IMPLEMENT COURSE TAG SYSTEM
+
+🎯 **Objective:**
+Add a full-featured **course tag system** that supports:
+
+* Adding comma-separated tags on course upload
+* Storing tags in the backend (non-case-sensitive)
+* Allowing multiple tags per course
+* Filtering/sorting by tags in the course catalog
+
+This should allow users to add tags like:
+`English, Construction, CST256`
+…and later view a tag list (like a filter) and see all courses grouped under “Construction” regardless of case.
+
+---
+
+## 🧭 OVERVIEW OF WHAT TO BUILD
+
+### 🔧 1. **\[BACKEND] Tag Storage (Normalize Input)**
+
+* Check first: Does the `courses` table already have a `tags` column (likely not)?
+* If missing, **add** a new column in your DB/schema:
+
+  ```ts
+  tags: text[]  // or string[] depending on your ORM
+  ```
+* Store comma-separated tag input as a lowercase array
+
+  * Example: `["english", "construction", "cst256"]`
+
+### 🔁 2. **\[BACKEND] API Update**
+
+* Course Upload endpoint (`/api/courses/upload` or equivalent) must:
+
+  * Accept a new field: `tags`
+  * Split by `,`, trim whitespace, normalize case → lowercase
+  * Store in DB as an array
+
+* When retrieving courses (e.g., `/api/courses`):
+
+  * Tags should come back as submitted (capitalize first letter if you want display standardization)
+
+### 🧩 3. **\[FRONTEND] Course Upload Tag Field**
+
+* On `/admin/courses/upload`, add a new input field:
+
+  * Label: `Tags (comma separated)`
+  * UI: Standard text input, not a chip-picker
+  * Allow raw typing: `English, Construction, CST256`
+* Submit value through existing upload API call
+
+### 📁 4. **\[FRONTEND] Tag Filter UI**
+
+* On `/admin/courses` page:
+
+  * At the top of the page, above course cards, add a **Tags dropdown** or filter bar
+  * Fetch all unique tags from current courses
+
+    * Tip: Derive dynamically on frontend, OR add a new API like `/api/tags`
+  * When a tag is selected, filter course list to show only matching tag(s)
+
+    * Use `course.tags.includes(selectedTag)` (normalized)
+
+---
+
+## ✅ SPECIAL BEHAVIORS
+
+### 🔁 **Case-Insensitive Matching**
+
+* Both `Construction` and `construction` must resolve to same tag
+* Store in lowercase; display capitalized
+
+### 🌈 **Multiple Tags Per Course**
+
+* Make sure your UI and DB can handle 1–∞ tags per course
+
+### 🚨 **Check Before Adding**
+
+Before writing new DB logic or APIs:
+
+* Check if `tags` already exist in the DB schema or frontend form
+* Check if tag logic already exists in upload endpoint
+* If similar filtering exists for categories, consider reusing UI components
+
+---
+
+## 📦 TECH CHECKLIST
+
+| Component                    | Action                                                               |
+| ---------------------------- | -------------------------------------------------------------------- |
+| `courses` DB model/schema    | Add `tags: text[]` or `tags: string[]`                               |
+| `/api/courses/upload`        | Accept and sanitize `tags` field                                     |
+| `/api/courses`               | Return `tags` with each course                                       |
+| `/admin/courses/upload` page | Add input field for `Tags (comma separated)`                         |
+| `/admin/courses` page        | Add Tag Filter UI and frontend tag-based filtering                   |
+| (Optional) `/api/tags`       | Return distinct tags if filtering frontend is too slow with big data |
+
+---
+
+## 💬 Reporting / QA
+
+When done, confirm:
+
+* [ ] Course uploads with multiple tags
+* [ ] Tags are not duplicated by case
+* [ ] Tags appear in UI filter and work
+* [ ] Filtering does not crash or render wrong
+
+---
+
+Let me know once this is implemented and QA'd — we’ll then scope the next UI polish phase to let admins edit tags after upload or batch assign tags to multiple courses.

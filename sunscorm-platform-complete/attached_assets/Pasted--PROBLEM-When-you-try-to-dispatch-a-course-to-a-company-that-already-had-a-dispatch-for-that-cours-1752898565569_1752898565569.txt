@@ -1,0 +1,92 @@
+🚨 PROBLEM
+When you try to dispatch a course to a company that already had a dispatch for that course (even if disabled), it throws this:
+
+json
+Copy
+Edit
+409 Conflict: "Dispatch already exists for this course and company"
+This should never happen for disabled dispatches. If it’s soft-deleted, it becomes a receipt, not a blocker.
+
+✅ OBJECTIVE — SYSTEMATIC BEHAVIOR
+“Disabled dispatches should never block a new dispatch. They are just audit trail receipts.”
+
+🧠 WHAT TO CHANGE
+🧩 1. findActiveDispatch() — FIX THE SOURCE
+📄 server/lib/dispatches/findActiveDispatch.ts or equivalent utility
+
+🔧 Change this function to only check for non-disabled dispatches:
+
+ts
+Copy
+Edit
+where: {
+  tenantId,
+  courseId,
+  isDisabled: false // 🔥 This line is the key
+}
+🔐 This is what’s triggering the 409 conflict — it’s checking everything instead of just active ones.
+
+📡 2. /api/dispatches POST Route
+📄 server/routes/dispatches.ts
+
+🧼 Clean up logic that throws 409 if the above findActiveDispatch() returns anything.
+
+✅ After fix, this should only prevent exact duplicates of active dispatches.
+
+ts
+Copy
+Edit
+const existing = await findActiveDispatch(...);
+if (existing) {
+  return res.status(409).json({ message: "Dispatch already exists for this course and company" });
+}
+🧠 But now this will only fire for non-disabled (which is good).
+
+🧾 3. Company Profile View (company-profile.tsx or similar)
+📄 client/src/pages/companies/[id].tsx or equivalent
+
+✅ Continue to show disabled dispatches in the company’s “Dispatch History” tab
+
+🧩 For each, show:
+
+Dispatch name
+
+Course title
+
+Date created / date disabled
+
+Limit settings (maxUsers, maxCompletions, expiresAt)
+
+Status: ✅ Active / 🧾 Disabled
+
+🧠 Disabled dispatches become permanent receipts, never blockers
+
+🧑‍💻 4. Create Dispatch Modal UX (Optional)
+📄 create-dispatch.tsx
+
+🧠 (Optional but nice): Add a passive banner or info pill if the tenant had an old disabled dispatch of that course:
+
+“⚠️ This course was previously dispatched to this company but is now disabled. You may re-dispatch it.”
+
+🧷 SANITY CHECK
+✅ Dispatches are uniquely scoped by:
+
+ts
+Copy
+Edit
+tenantId + courseId + isDisabled = false
+👎 tenantId + courseId alone is not enough — it breaks reusability.
+
+🧱 ENFORCEMENT COMMENTS (Add to File Headers)
+ts
+Copy
+Edit
+// NOTE: Disabled dispatches do not block new dispatches. They act only as historical receipts.
+// Only active (non-disabled) dispatches are used in uniqueness checks.
+🧪 AFTER THIS FIX
+✅ You can re-dispatch the same course to the same company as many times as you want (as long as prior one is disabled)
+
+✅ Old dispatch shows up as history on company page
+
+✅ Conflict only happens if you're trying to dispatch something that is already live for that company
+

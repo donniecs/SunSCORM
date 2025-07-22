@@ -1,0 +1,103 @@
+🚨 CRITICAL FIX SPRINT — PHASE 13C  
+You are a junior engineer working under tight security standards.  
+You are not allowed to improvise, duplicate logic, or scaffold new routes without first confirming whether the logic already exists.  
+
+🔧 Your task is to fix the CRITICAL ISSUES identified in our system audit.  
+You must search existing functions, confirm line locations, and follow this exact instruction set for each one:
+
+---
+
+### ✅ TASK 1: Secure `/api/xapi/statements` Route
+
+🔍 Step-by-step:
+1. Find the existing handler for POST `/api/xapi/statements` (line 396 in `server/routes.ts`)
+2. Check if any authentication middleware is applied.
+3. Search the repo for `isAuthenticated`, `requireAuth`, or similar — confirm if it's used here.
+4. If not, apply the same middleware used for `/api/dashboard/stats` (line 60).
+5. DO NOT rewrite the whole route — only insert the correct middleware.
+
+✅ Output:
+- Confirm the middleware file and name
+- Confirm it’s attached correctly
+- Ensure route still works (log POST with dummy data if needed)
+
+---
+
+### ✅ TASK 2: Implement Real SCORM Package Validation
+
+🔍 Step-by-step:
+1. Locate the `POST /api/courses/upload` route (line 173 of `server/routes.ts`)
+2. Read the `multer` config — note storage location and file size.
+3. Before calling `createCourse()`, implement validation logic:
+    - Ensure uploaded file is a valid ZIP
+    - Validate that it contains `imsmanifest.xml` at the root or within expected SCORM structure
+4. Use a helper function like `validateSCORMPackage(file: Express.Multer.File): boolean`
+5. Place this logic in `server/storage.ts` or `server/utils.ts` if it exists — DO NOT inline this unless instructed.
+
+✅ Output:
+- Create `validateSCORMPackage.ts` if no utility module exists
+- Return an error message if invalid, before calling `createCourse()`
+
+---
+
+### ✅ TASK 3: Add Persistent Storage (Not /tmp)
+
+🔍 Step-by-step:
+1. Search the full codebase for references to `/tmp/` — identify where Multer stores uploaded files
+2. Pick a cloud provider:
+    - If we already use Supabase: use Supabase Storage
+    - If not, install and configure Cloudflare R2 or S3-compatible bucket (mock only)
+3. Update the Multer config to upload files to the cloud destination (buffer upload)
+4. Add `uploadToCloud(fileBuffer, filename)` in a new `storageService.ts` or reuse if it already exists
+5. Replace any hardcoded `/tmp/` logic with secure cloud path references
+
+✅ Output:
+- Confirm new upload destination
+- Preserve all existing SCORM upload logic
+- Ensure uploaded files persist across restarts
+
+---
+
+### ✅ TASK 4: Remove `/api/tenants` Duplication
+
+🔍 Step-by-step:
+1. Search `server/routes.ts` for ALL `app.get("/api/tenants")` and `app.post("/api/tenants")` entries
+2. Confirm which version is guarded by admin middleware
+3. Remove the unprotected or duplicate version
+4. Make sure only one version remains, and it's guarded with:
+   - `isAuthenticated`
+   - `requireAdminRole` (or whatever RBAC middleware exists)
+
+✅ Output:
+- File + line of removed route
+- Final tenant route(s) confirmed
+
+---
+
+### ✅ TASK 5: Add CSRF Protection to All Sensitive Routes
+
+🔍 Step-by-step:
+1. Search all `POST`, `PUT`, and `DELETE` API routes in `server/routes.ts`
+2. Confirm if CSRF protection exists — if not, install `csurf` middleware or similar
+3. Add CSRF middleware at the app level OR per route group
+4. Return CSRF token to frontend via GET `/api/csrf-token` and expect it in headers
+
+✅ Output:
+- Middleware config
+- Affected routes protected
+- Example of successful CSRF token check
+
+---
+
+### GENERAL RULES FOR ALL TASKS:
+
+🧠 Always check if a function or route already exists before creating anything  
+📂 All helper functions go in `utils/`, `services/`, or existing controller modules  
+🔐 Security must meet production-grade: no test bypasses, no console.log-only responses  
+💥 DO NOT touch unrelated files or rewire routes unless explicitly instructed  
+💬 Comment every function you write or edit with a summary of its purpose
+
+---
+
+Once you complete this, output a full summary like this:
+

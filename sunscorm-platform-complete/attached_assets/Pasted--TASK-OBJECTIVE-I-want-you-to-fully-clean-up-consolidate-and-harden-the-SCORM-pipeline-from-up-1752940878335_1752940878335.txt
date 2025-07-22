@@ -1,0 +1,81 @@
+🎯 TASK OBJECTIVE
+I want you to fully clean up, consolidate, and harden the SCORM pipeline — from upload to dispatch — using the audit provided in STRUCTURED_SCORM_AUDIT.md. You must resolve every single ❌ listed. This includes:
+
+Fixing all duplicate logic (ZIP parsing, dispatch validation, launch template injection, etc.)
+
+Splitting routes.ts into clean domain-specific files:
+
+routes/courses.ts,
+
+routes/dispatches.ts,
+
+routes/upload.ts,
+
+routes/launch.ts
+
+Replacing all deprecated or unused routes, like /launch-file
+
+Fixing missing SCORM 2004 support via imsmanifest.xml parsing in scormValidator.ts
+
+Improving SCORM Preview UI (responsive, persistent)
+
+Fixing missing progress bars for ZIP exports
+
+Implementing full generateLaunchFile() as a single universal utility
+
+Implementing ZIP extraction caching for all preview/launch flows
+
+Ensuring the soft delete system is respected system-wide — do not serve deleted content to previews/launches
+
+Ensuring dispatch deletions deactivate active LMS users' access properly
+
+Audit all SCORM dispatch ZIP creation logic for correctness against the attached research
+
+📂 CONTEXT FILES
+Reference the following files that document the current state of the system:
+
+STRUCTURED_SCORM_AUDIT.md – full audit and tree
+
+SCORM_SYSTEM_AUDIT.md – component structure & naming
+
+SYSTEM_AUDIT_REPORT.md – older partial audit
+
+✅ These contain accurate mappings of:
+
+Routes
+
+Files
+
+Functions
+
+Features
+
+Known Issues
+
+🛡️ RULES
+🔍 Before editing anything, check if functionality exists — DO NOT duplicate logic. Always confirm via file scan and explain if replacing or centralizing.
+
+🧹 Consolidate all ZIP parsing into a single file
+
+📦 Use a single ZIP export utility
+
+🔐 All SCORM previews and dispatch launches should go through a permission+isDisabled check
+
+🔁 No external LMS should ever see a JSON response
+
+📱 Ensure the SCORM iframe is responsive for mobile in both preview + LMS launch
+
+🚨 ALL course previews must match launch structure
+
+⚠️ If anything is unclear, log your decision in CHANGELOG.md or NEXT_STEPS.md
+
+📤 FINAL DELIVERABLES
+Full code cleanup
+
+Working upload + dispatch + preview + LMS launch on deployed site
+
+All known errors gone (especially 413s, undefined launch_url, broken token validations)
+
+One universal SCORM 1.2+ launcher
+
+Written summary of what was fixed in CHANGELOG.md

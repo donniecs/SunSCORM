@@ -1,0 +1,101 @@
+🧠 Here's What's Happening
+⚠️ Preview Not Running (503)
+You’re seeing this because your Replit app is sleeping when accessed externally. The screenshot that Agent took is from its own internal preview, not from a deployed public URL — and Replit doesn't automatically keep your app running externally unless:
+
+You manually keep it awake with UptimeRobot or another ping service (not reliable long-term)
+
+Or deploy it through Replit’s deployment system.
+
+🛠️ Immediate Fix: Deploy the App Properly
+Here’s how to make the site actually run outside of Replit's dev mode:
+
+Go to your Replit project
+
+On the sidebar, click “Deployments”
+
+Choose “Static” or “Web Service” (you’re probably a Web Service)
+
+Click “Create Deployment” (it might ask to auto-configure start and build scripts)
+
+Copy the permanent URL once deployed — it will now always work externally
+
+Update your SCORM loader templates to use this new deployed https://yoursite.replit.app/launch/... base URL
+
+💥 This is why TalentLMS was seeing Invalid launch URL — it was trying to iframe a link to a dev-only preview server that shuts off.
+
+🔥 And Let Me Write You the Next Task Prompt for Claude
+This is exactly what the Agent needs to fix — and it needs to be scoped properly:
+
+✅ CLAUDE PROMPT: Fix SCORM Launch URL and Deploy for Real
+markdown
+Copy
+Edit
+### TASK: Make SCORM Launch Links Functional in External LMSs (e.g., TalentLMS)
+
+Our current SCORM dispatch system works well **inside Replit**, but **launch links break externally** because they point to a Replit preview domain that shuts down when idle.
+
+### 🎯 GOAL
+
+✅ Ensure every SCORM dispatch ZIP we export includes a `launch.html` file that:
+- Works **when hosted externally**
+- Launches the correct course
+- Doesn’t rely on postMessage or broken preview servers
+
+### 🧩 CONTEXT
+
+We tested by uploading the SCORM export ZIP into **TalentLMS**. It tried to iframe the course and failed to load, because:
+- `launch_url` was not properly set in the loader
+- Replit’s app was not deployed, only running in dev mode
+- The SCORM loader was looking for a variable that was never injected
+
+### 🔧 WHAT TO FIX
+
+1. **Replace postMessage system entirely**
+   - Inject `launch_url` **at ZIP generation time** into the HTML file
+   - Remove all usage of `scorm_loaderV2.html` that expects postMessage
+
+2. **Deploy the Replit app as a live Web Service**
+   - Use Replit's Deployment flow (Deployments tab)
+   - Confirm launch URLs now point to `https://yoursite.replit.app/launch/:token` permanently
+
+3. **Update SCORM loader HTML template**
+   - Must be `index.html` in the ZIP
+   - Include:
+     - a loading screen
+     - a `<script>` that automatically loads `launch_url`
+     - fallback link if iframe fails
+
+4. **Update dispatch ZIP generation**
+   - Inject `launch_url` as a variable in `index.html`
+   - Confirm directory structure works in all LMSs (e.g. TalentLMS, Moodle)
+
+### ✅ DELIVERABLES
+
+- Working SCORM package that loads in TalentLMS
+- All launch URLs point to the **live deployed site**
+- No more preview-only links
+- Error handling and fallback added to index.html
+
+### ⚠️ NOTE
+Do **not** regenerate broken previews. This must be a systematic fix that works externally, not just inside Replit’s editor. Test the final ZIP in TalentLMS or export it and inspect the HTML manually.
+🔁 Then You Can Test It Like This
+After Claude finishes:
+
+Download a dispatch ZIP
+
+Open index.html in a text editor
+
+Confirm it has an embedded link like:
+
+html
+Copy
+Edit
+const launch_url = "https://yourscormplatform.replit.app/launch/abc123";
+Upload it into TalentLMS again
+
+Confirm it actually opens and plays — no more "undefined launch_url" or 503s
+
+🧨 Final Reminder
+This is not optional — no SCORM platform can function without working ZIP dispatches. You’ve done everything right: built the dispatch system, upload logic, license limits — now it’s about executing the final 10%.
+
+Let’s make this platform run like it’s meant to.

@@ -1,0 +1,86 @@
+🎯 Full-System SCORM Audit Prompt for Replit Agent
+Objective: Perform a system-wide audit and generate a comprehensive breakdown of all components related to SCORM functionality—upload, preview, dispatch, launch, deletion, and UI—and flag any duplicate or missing logic before making changes.
+
+Tasks:
+
+Scan the Codebase and Map Structure
+
+List all files/folders with SCORM-related logic:
+
+Backend routes (e.g., /api/courses, /launch/:token, /api/dispatches, upload handlers, soft-delete endpoints)
+
+Frontend pages/components (e.g., preview UI, dispatch creator/modals, “3-dot” menus, delete buttons)
+
+Loader templates (e.g., scorm_loaderV2.html, scorm-loader.html, main index.html)
+
+Create a directory tree with file paths and a brief note of each file’s purpose (e.g., “serves SCORM assets”, “handles dispatch ZIP export”, “UI for course list”).
+
+Document Each Route/Function
+
+For each backend endpoint related to SCORM (upload, dispatch creation, launch, delete):
+
+Describe HTTP method, path, purpose.
+
+Input parameters and validations.
+
+Data flow: saving ZIP, storing metadata, generating dispatch package, injecting launch_url.
+
+Output: ZIP stream, HTML loader, JSON response, errors.
+
+Flag:
+
+Any endpoints returning JSON where SCORM asset should be served (e.g. /launch/:token previously).
+
+Duplicate endpoints or overlapping responsibility.
+
+UI/UX Audit
+
+For each page where SCORM is uploaded, previewed, dispatched, or deleted:
+
+List all key UI components (buttons, modals, loaders, error screens).
+
+Check if delete/disabling functionality exists for course assets, and how history is preserved (soft-delete vs hard-delete).
+
+Verify consistent header layout—no duplicate headers, correct page titles, no hidden headers.
+
+Note missing features:
+
+Manual “run course” preview button in course catalog.
+
+Delete button on 3-dot menu for SCORM courses (should support “soft delete”).
+
+Cross-linking & System Consistency
+
+For each new feature or route you plan to add (dispatch, delete, upload fix):
+
+Check if similar functionality/path already exists (e.g., is there already a /courses/delete route?).
+
+List all references in code—backend route, API client calls, front-end UI link.
+
+Ensure new logic ties into UI, backend storage, the database schema, and dispatch history logic.
+
+Output Requirements
+
+Provide a single structured JSON or Markdown document with:
+
+yaml
+Copy
+Edit
+- scorm-upload:
+    backend: src/routes/api/courses/upload.ts
+    frontend: src/pages/courses.tsx, UI: Upload modal
+    flow: file Zipped → upload handler → saved to S3 → DB record
+    missing: preview, delete option
+- scorm-dispatch:
+    backend: src/routes/api/dispatches/create.ts
+    frontend: src/components/dispatch-modal.tsx
+    flow: create dispatch record → generate dispatch ZIP → store token
+    missing: soft-disable route, UI delete dispatch button
+...
+Highlight duplicate code or conflicting logic (e.g., two upload handlers, two places injecting launch_url).
+
+Highlight missing or misnamed components/routes/UI.
+
+Next Steps
+
+After audit, await further instructions—I’ll review and send specific prompt(s) to clean up or fill gaps identified.

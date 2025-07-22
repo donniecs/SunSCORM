@@ -1,0 +1,75 @@
+✅ URGENT PROMPT: Fix Final SCORM Dispatch Launch Failure on Deployed Domain
+yaml
+Copy
+Edit
+🧠 CONTEXT:
+We're fully deployed at:  
+🔗 https://sun-scorm-manager-dscalessa1010.replit.app
+
+We are trying to launch a SCORM dispatch ZIP in TalentLMS using that live domain.
+
+The loader initializes and injects this launch URL:
+
+🔗 https://sun-scorm-manager-dscalessa1010.replit.app/launch/d5713e8d-39f0-4ccb-9b03-0d7cb4749ef3
+
+But it **fails to open** with the following console errors:
+
+❌ `Invalid launch URL detected`
+❌ `Uncaught TypeError: Cannot read properties of undefined (reading 'launch_url')`
+❌ `Fallback triggered: Redirect may have failed, showing manual launch option`
+
+---
+
+### 🚨 WHAT TO FIX RIGHT NOW
+
+#### ✅ 1. **Stop Referencing `scorm_loaderV2.html`**
+- This file is **still in the exported ZIP**, and it’s causing the launch_url error via postMessage fallback.
+- We **no longer use postMessage.** All launch_url values are injected at build time now.
+- **Delete this file from the dispatch package generation step**
+- All logic should rely exclusively on the new `index.html` that already has `launch_url` baked in.
+
+#### ✅ 2. **Ensure Only `index.html` Is the SCORM Entrypoint**
+- Confirm that:
+  - `imsmanifest.xml` references `index.html` as the launch file
+  - No loaderV2 files are referenced or zipped
+  - `index.html` correctly includes `launch_url` as a variable **not undefined**
+- Inject launch URL **as a string in a `<script>` tag or variable** like:
+
+```js
+const LAUNCH_URL = "https://sun-scorm-manager-dscalessa1010.replit.app/launch/<token>";
+Make sure the HTML uses that constant directly.
+
+✅ 3. Fix Index.html Logic for Invalid Launch
+The message “Invalid launch URL” is being triggered by a guard clause in index.html:181.
+
+Update that clause to only fire if the URL is missing or malformed.
+
+Do not trigger fallback just because it isn’t localhost or Replit dev — this is now the valid production domain.
+
+✅ Example:
+
+js
+Copy
+Edit
+if (!launchUrl || !launchUrl.startsWith("https://")) {
+  showManualLaunchOption();
+  return;
+}
+window.location.href = launchUrl;
+🧪 CONFIRMATION CHECKLIST (After Fix Is Applied)
+✅ SCORM ZIP only includes index.html as the entry point
+
+✅ No scorm_loaderV2.html in ZIP
+
+✅ index.html has valid launchUrl injected directly in code
+
+✅ Launch URL works inside TalentLMS (no “invalid” message or postMessage fallback)
+
+✅ Course fully loads and plays with no console errors
+
+💡 Reminder
+We're now deployed. Stop referencing preview server URLs in any part of the app or export logic. Use only:
+
+🔗 https://sun-scorm-manager-dscalessa1010.replit.app
+
+This is what LMS platforms will expect — and it works.

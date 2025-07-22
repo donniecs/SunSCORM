@@ -1,0 +1,146 @@
+Here’s your **master prompt** to give the Replit Agent — written like a senior dev lead kicking off a full system audit and mapping session for the engineering team.
+
+Use this to generate a **comprehensive blueprint** of your Sun-SCORM platform, including:
+
+* File tree structure
+* Page-to-component routing
+* API endpoints
+* Button-to-function connections
+* All disconnected or unfinished features
+
+---
+
+## 🧭 REPLIT AGENT PROMPT — FULL SYSTEM BLUEPRINT + ROUTE MAPPING
+
+> 🧠 **Your Role:**
+> You are acting as a senior engineer performing a full platform audit. We are now at the point where we must **fully understand and document** how every part of this app fits together: routes, files, components, backend logic, and UI connections.
+
+---
+
+## 🎯 OBJECTIVE
+
+Deliver a **complete breakdown** of the current system — front to back — so we know:
+
+1. What features exist
+2. What buttons and pages are wired to
+3. Which routes and API endpoints are active
+4. What files connect to what views or behaviors
+5. What is broken, missing, or orphaned
+
+---
+
+## 🔍 WHAT TO INCLUDE IN YOUR REPORT
+
+Break this into 5 major sections:
+
+---
+
+### 1. 🗂️ FILE TREE SNAPSHOT
+
+* List out all major folders and files (e.g. `/pages`, `/components`, `/lib`, `/api`, etc.)
+* Call out special ones like dynamic routes (`[id].tsx`), or `utils`, `hooks`, etc.
+
+Format:
+
+```bash
+/pages
+  ├── index.tsx
+  ├── courses.tsx
+  ├── companies.tsx
+  └── companies/[companyId].tsx
+/components
+  ├── CompanyCard.tsx
+  ├── DispatchTable.tsx
+  └── ...
+```
+
+---
+
+### 2. 🌐 ROUTING MAP (Frontend)
+
+* List out all frontend routes and what page/component they render
+* Include dynamic params like `/companies/[id]`
+* Indicate where they are navigated from (e.g. `onClick` in `CompanyCard.tsx`)
+
+Format:
+
+```
+/courses → CoursesPage.tsx  
+  - Contains: UploadCourseModal, AssignToCompanyModal  
+  - Button: 'Assign to Company' → Opens AssignModal
+
+/companies → CompaniesPage.tsx  
+  - Each card: onClick → `/companies/[id]`
+```
+
+---
+
+### 3. 📡 API ROUTES & FUNCTIONS
+
+* List out all API routes in `/pages/api/...`
+* What each one does (e.g. `/api/dispatches` → returns all dispatches or by tenantId)
+* Highlight ones that are unused or stubbed out
+
+Format:
+
+```
+/api/dispatches.ts  
+  - GET: ?tenantId → returns dispatches for tenant  
+  - POST: create new dispatch  
+
+/api/courses.ts  
+  - GET: fetch all courses  
+  - POST: upload new course  
+  - PATCH: update course (used in edit modal)
+```
+
+---
+
+### 4. 🧪 COMPONENT FUNCTION MAP
+
+* Go through key components and break down what functions/buttons they expose
+* Note **which ones are working**, which are stubbed, and which are disconnected
+
+Format:
+
+```
+📄 CompanyCard.tsx  
+  - View Dispatches → navigates to /companies/[id]  
+  - License Settings → opens LicenseSettingsModal  
+  ✅ Working
+
+📄 DispatchTable.tsx  
+  - Shows all dispatches from props  
+  - No click actions yet  
+  ✅ Working
+```
+
+---
+
+### 5. 🚫 UNUSED / DISCONNECTED FEATURES
+
+* List any buttons, modals, or components that exist **but are not wired up**
+* List routes or files that are created but not used
+* Highlight where we could delete dead code or need to finish wiring
+
+---
+
+## 🔧 FORMAT
+
+Return this as **markdown** with clear headers for each section and use ✅ / ❌ to flag working vs broken. Use codeblocks for routes and file trees.
+
+---
+
+## 🧩 WHY WE NEED THIS
+
+This is critical to:
+
+* Identify disconnected features
+* Ensure no route or button is dangling
+* Prepare for scaling / onboarding new developers
+* Lock in consistency across the SCORM system
+* Know what is safe to refactor or reuse
+
+---
+
+Run this now and make the breakdown **clean, complete, and readable** — just like you'd deliver in a kickoff audit at a real SaaS company.

@@ -1,0 +1,113 @@
+Absolutely. Here's how to **reframe and elevate the dev prompt** like a real dev lead would—**systemic impact awareness baked in**. This version holds the devs accountable for thinking ahead, respecting relationships between entities, and preventing UX-breaking inconsistencies like what you just experienced.
+
+---
+
+## 🚨 CRITICAL FIX + SYSTEMIC PATCH: Dispatch Conflict Handling + Soft Deletion Logic
+
+---
+
+### 🎯 **Purpose**
+
+We introduced dispatch soft-deletion (`isDisabled = true`) — but the system still **prevents reassigning the same course to the same company** due to `courseId + tenantId` uniqueness. This breaks the UX and blocks workflows.
+
+---
+
+### 🧠 **Root Cause**
+
+* The backend still treats **disabled dispatches** as *active* in uniqueness checks.
+* There’s no systemic logic to define what “active dispatch” means vs. archived.
+
+---
+
+### ✅ REQUIRED FIXES (WITH SYSTEMIC IMPACT IN MIND)
+
+---
+
+### 1. **Backend: Update Uniqueness Logic**
+
+In `POST /api/dispatches` (dispatch creation):
+
+* Modify the uniqueness check to **exclude dispatches where `isDisabled === true`**
+
+```ts
+const existing = await db.dispatch.findFirst({
+  where: {
+    courseId,
+    tenantId,
+    isDisabled: false // ✅ only block true duplicates
+  }
+})
+```
+
+* ✅ Allow creating a new dispatch for the same course + tenant **if previous one was disabled**
+* 💡 Optional: warn if a disabled one exists — but allow assignment
+
+---
+
+### 2. **Frontend UX: Surface Better Error**
+
+If a 409 happens, the UI currently just shows:
+
+> "Dispatch already exists..."
+
+➡️ Update to:
+
+> "This course has already been assigned to this company. You can only assign a course once. If you want to assign it again, please disable the previous dispatch."
+
+⚠️ Or better: **prevent assignment entirely in the UI** by detecting an active dispatch.
+
+---
+
+### 3. **System-wide Dispatch Validation**
+
+Go through all parts of the system where dispatches are queried:
+
+* **Analytics**
+* **Company view**
+* **Launch tokens**
+* **Assign modals**
+
+➡️ Every one of these should filter out `isDisabled === true` unless explicitly needed (e.g. history logs)
+
+---
+
+### 4. **Consistency Rules (To Prevent Future UX Breaks)**
+
+From now on, for **any new feature** (like dispatch disable, tags, etc), devs must follow these checks:
+
+🧷 **System-Wide Impact Questions** (MANDATORY before merge):
+
+* What entities reference this model (e.g., Dispatch → Courses, Tenants, Users)?
+* If soft-deleted or disabled, should the related UI still display the record?
+* Does creation logic need to exclude archived entries?
+* Are analytics still counting this?
+* Are we leaving orphaned references?
+
+📌 Add this checklist to the dev README or CONTRIBUTING.md if possible.
+
+---
+
+### 5. **Optional Improvement (Better UX)**
+
+If an admin tries to assign a course to a company that already has a disabled dispatch:
+
+* Ask: "You’ve already assigned this course to this company in the past. Do you want to reactivate the existing dispatch instead?"
+
+If yes:
+
+```ts
+update dispatch set isDisabled = false, deletedAt = null where id = ...
+```
+
+---
+
+### 🔐 Integrity Note
+
+You must **not** allow 2 active dispatches with the same courseId + tenantId — ever.
+
+If there's already one active: block.
+If the old one was disabled: allow new.
+
+---
+
+Let me know when this patch is confirmed. Then we’ll tighten up reactivation logic, deep filtering, and unified audit trails.

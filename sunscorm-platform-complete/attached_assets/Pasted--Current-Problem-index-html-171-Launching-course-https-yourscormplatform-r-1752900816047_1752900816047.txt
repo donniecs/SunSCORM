@@ -1,0 +1,96 @@
+
+---
+
+## 🚨 Current Problem:
+
+```
+index.html:171 Launching course: https://yourscormplatform.replit.app/launch/ce3f9d9d-2350-4556-acbd-2ff227c88246  
+index.html:175 Invalid launch URL  
+```
+
+This confirms:
+
+* ✅ The loader is **finding the launch URL**
+* ❌ But it’s a placeholder: `https://yourscormplatform.replit.app/...`
+* 🔥 Meaning: **the Replit Agent is still injecting a dummy string**, not the real environment-based domain
+
+---
+
+## ✅ What to Fix Now (Final Steps):
+
+You need to **patch the backend ZIP builder** to dynamically inject the **correct public base URL** (your Replit app's actual domain) instead of that fake placeholder.
+
+---
+
+### 📍 Replit Prompt (Full Detail, Hand-Holding Style)
+
+Here’s the **exact next prompt** to send to the Replit agent:
+
+---
+
+### 🛠 PATCH: Inject Real Hostname in SCORM Dispatch ZIP Loader
+
+Our new SCORM dispatch ZIP now uses `server/templates/scorm-loader.html`, and the loader works beautifully in LMS environments.
+
+However, it currently injects a hardcoded launch URL like:
+
+```
+https://yourscormplatform.replit.app/launch/:token
+```
+
+We need to dynamically inject the **correct base URL** from the current environment (Replit hostname) into the dispatch ZIP at generation time.
+
+---
+
+#### ✅ Required Fixes:
+
+1. **Update ZIP Generation Logic**
+
+In the file that builds the ZIP archive (likely `generateDispatchZip.ts` or equivalent), find where you're doing:
+
+```ts
+const launchUrl = `https://yourscormplatform.replit.app/launch/${dispatch.launchToken}`;
+```
+
+Replace this with something like:
+
+```ts
+const baseUrl = process.env.PUBLIC_APP_URL || "https://fallback-url.com";
+const launchUrl = `${baseUrl}/launch/${dispatch.launchToken}`;
+```
+
+> ✅ If `PUBLIC_APP_URL` is not set, fallback to a placeholder and log a warning.
+
+---
+
+2. **Set the Environment Variable (Optional, but Ideal)**
+
+In `.env` or Replit Secrets:
+
+```
+PUBLIC_APP_URL=https://your-actual-replit-url.replit.app
+```
+
+This allows the ZIP generation to always inject the correct `launch_url`, even in dev or prod.
+
+---
+
+3. **Validate That Placeholder is Gone**
+
+After rebuilding a dispatch:
+
+* Open the new ZIP
+* Open `index.html` (or `scorm_loader.html`)
+* Check the string `launch_url = "..."` — make sure it’s using your real domain
+* Reupload to TalentLMS and it should **fully launch the SCORM course**
+
+---
+
+#### 🔒 Bonus (Prevent This in Future):
+
+✅ Add a check that throws an error if the string `yourscormplatform.replit.app` ever appears in the final ZIP — that way you don’t accidentally publish broken dispatches.
+
+---
+
+Once you’ve run that, upload a fresh dispatch ZIP and try again. The course should launch clean.
+

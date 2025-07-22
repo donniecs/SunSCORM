@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SCORM Course Loading...</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #ffffff;
+        }
+        
+        .loader-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        h2 {
+            margin: 0 0 10px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        p {
+            margin: 10px 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #ffffff;
+            border-radius: 2px;
+            animation: progress 3s ease-in-out;
+        }
+        
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        
+        .error-container {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .manual-link {
+            display: inline-block;
+            color: #ffffff;
+            text-decoration: underline;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .manual-link:hover {
+            opacity: 0.8;
+        }
+        
+        noscript {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px;
+            color: #ff6b6b;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="loader-container">
+        <div class="spinner"></div>
+        <h2>Loading Course...</h2>
+        <p>Preparing your learning experience</p>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <p id="status">Initializing...</p>
+        
+        <div class="error-container" id="errorContainer">
+            <h3>Unable to Load Course</h3>
+            <p>There was an issue launching the course automatically. Please use the manual launch link below.</p>
+            <a href="__LAUNCH_URL__" class="manual-link" target="_top">Launch Course Manually</a>
+            <br><br>
+            <small>If this link doesn't work, please contact your LMS administrator.</small>
+        </div>
+    </div>
+
+    <noscript>
+        <div>
+            <h2>JavaScript Required</h2>
+            <p>This course requires JavaScript to be enabled in your browser.</p>
+            <p>Please enable JavaScript and refresh the page, or <a href="__LAUNCH_URL__" style="color: #667eea; text-decoration: underline;">click here to launch the course directly</a>.</p>
+        </div>
+    </noscript>
+
+    <!-- Professional SCORM Runtime Integration -->
+    <script src="https://cdn.jsdelivr.net/npm/scorm-again@latest/dist/scorm-again.min.js"></script>
+    
+    <script>
+        // Professional SCORM API Runtime using scorm-again
+        // Provides SCORM 1.2 and 2004 API compliance for external LMS integration
+        
+        // Initialize professional SCORM runtime
+        let scormAPI = null;
+        
+        function initializeSCORMRuntime() {
+            try {
+                // Detect SCORM version and initialize appropriate API
+                const scormVersion = "__SCORM_VERSION__" || "1.2"; // Default to SCORM 1.2
+                
+                if (scormVersion === "2004" || scormVersion === "scorm_2004") {
+                    // SCORM 2004 API
+                    scormAPI = new window.ScormAgain.Scorm2004API({
+                        enableOfflineSupport: true,
+                        autocommit: true,
+                        lmsCommitUrl: "__COMMIT_URL__",
+                        courseId: "__COURSE_ID__",
+                        studentId: "__STUDENT_ID__",
+                        studentName: "__STUDENT_NAME__"
+                    });
+                    
+                    // Make API available to SCORM content
+                    window.API_1484_11 = scormAPI;
+                    console.log('SCORM 2004 API initialized successfully');
+                } else {
+                    // SCORM 1.2 API (default)
+                    scormAPI = new window.ScormAgain.Scorm12API({
+                        enableOfflineSupport: true,
+                        autocommit: true,
+                        lmsCommitUrl: "__COMMIT_URL__",
+                        courseId: "__COURSE_ID__",
+                        studentId: "__STUDENT_ID__",
+                        studentName: "__STUDENT_NAME__"
+                    });
+                    
+                    // Make API available to SCORM content
+                    window.API = scormAPI;
+                    console.log('SCORM 1.2 API initialized successfully');
+                }
+                
+                // Add debugging capabilities
+                if (scormAPI) {
+                    scormAPI.on('Initialize', () => console.log('SCORM: LMSInitialize called'));
+                    scormAPI.on('Commit', () => console.log('SCORM: LMSCommit called'));
+                    scormAPI.on('Finish', () => console.log('SCORM: LMSFinish called'));
+                    scormAPI.on('GetValue', (cmi) => console.log('SCORM: LMSGetValue called for:', cmi));
+                    scormAPI.on('SetValue', (cmi, value) => console.log('SCORM: LMSSetValue called:', cmi, value));
+                }
+                
+            } catch (error) {
+                console.error('Failed to initialize SCORM API:', error);
+                // Continue with loader even if SCORM API fails
+            }
+        }
+        
+        // Initialize SCORM runtime immediately
+        if (window.ScormAgain) {
+            initializeSCORMRuntime();
+        } else {
+            // Wait for scorm-again to load
+            window.addEventListener('load', initializeSCORMRuntime);
+        }
+        
+        // SCORM Dispatch Loader
+        // This loader redirects to the actual course launch URL
+        
+        // The launch URL is injected during ZIP generation
+        const LAUNCH_URL = "__LAUNCH_URL__";
+        
+        // Debug logging
+        console.log("SCORM Loader initialized");
+        console.log("Launch URL:", LAUNCH_URL);
+        
+        let redirectTimer;
+        let statusUpdateTimer;
+        let currentStep = 0;
+        
+        const statusMessages = [
+            "Initializing...",
+            "Connecting to course server...",
+            "Loading course content...",
+            "Preparing launch..."
+        ];
+        
+        function updateStatus() {
+            const statusElement = document.getElementById('status');
+            if (currentStep < statusMessages.length) {
+                statusElement.textContent = statusMessages[currentStep];
+                currentStep++;
+            }
+        }
+        
+        function showError() {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.style.display = 'block';
+            document.getElementById('status').textContent = 'Error occurred';
+        }
+        
+        function launchCourse() {
+            console.log('Launching course:', LAUNCH_URL);
+            
+            // Validate launch URL - only check for placeholders and undefined values
+            if (!LAUNCH_URL || LAUNCH_URL === "__LAUNCH_URL__" || LAUNCH_URL.includes("undefined") || LAUNCH_URL.includes("__LAUNCH_URL__")) {
+                console.error('Invalid launch URL detected:', LAUNCH_URL);
+                showError();
+                return;
+            }
+            
+            // Additional validation - check if URL is properly formed and starts with https
+            try {
+                const url = new URL(LAUNCH_URL);
+                if (!url.protocol.startsWith('http')) {
+                    throw new Error('Invalid protocol');
+                }
+            } catch (urlError) {
+                console.error('Malformed launch URL:', LAUNCH_URL, urlError);
+                showError();
+                return;
+            }
+            
+            try {
+                console.log('Redirecting to:', LAUNCH_URL);
+                // Try to launch in the same window (most LMS prefer this)
+                window.location.href = LAUNCH_URL;
+            } catch (error) {
+                console.error('Failed to launch course:', error);
+                showError();
+            }
+        }
+        
+        // Initialize the loader
+        function init() {
+            console.log('SCORM Loader V2 initialized');
+            
+            // Update status messages
+            statusUpdateTimer = setInterval(updateStatus, 750);
+            
+            // Launch after 3 seconds (gives time for loader animation)
+            redirectTimer = setTimeout(function() {
+                clearInterval(statusUpdateTimer);
+                launchCourse();
+            }, 3000);
+        }
+        
+        // Cleanup function
+        function cleanup() {
+            if (redirectTimer) clearTimeout(redirectTimer);
+            if (statusUpdateTimer) clearInterval(statusUpdateTimer);
+        }
+        
+        // Start when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', cleanup);
+        
+        // Error handling for network issues
+        window.addEventListener('error', function(e) {
+            console.error('Page error:', e);
+            showError();
+        });
+        
+        // Enhanced fallback - if something goes wrong, show manual link after 8 seconds
+        setTimeout(function() {
+            // Check if we're still on the same page (redirect failed)
+            if (window.location.href.indexOf(LAUNCH_URL) === -1 && 
+                (window.location.href.includes('index.html') || window.location.href.includes('blob:'))) {
+                console.log('Fallback triggered: Redirect may have failed, showing manual launch option');
+                showError();
+            }
+        }, 8000);
+        
+        // Additional debugging for LMS compatibility
+        window.addEventListener('beforeunload', function() {
+            console.log('Page unloading - redirect successful');
+        });
+    </script>
+</body>
+</html>

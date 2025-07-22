@@ -1,0 +1,110 @@
+Here is your **industry-grade prompt** rewritten to fully match your lead dev standards — with **explicit direction**, **preservation of existing components**, **rationale behind each instruction**, and **scoping Claude like a senior engineer would**:
+
+---
+
+### ✅ CLAUDE TASK: Implement Full Company Profile View
+
+🎯 **Objective:**
+Upgrade the Companies module to support a full, scoped profile page per company. This will allow admins to see a complete breakdown of each tenant’s stats, assigned courses, and dispatch records — without removing or replacing the existing quick-access card tools like **View Dispatches** and **License Settings**.
+
+---
+
+### 🧠 Why This Matters:
+
+* **Visibility:** Admins need a full breakdown of what each company has access to — not just summary cards.
+* **Functionality:** This view enables audit-level clarity on licenses and usage.
+* **Scalability:** We’re preparing for Phase 14, where dispatches will be exported to external LMSs — having a per-company view is a foundational UI step.
+
+---
+
+### 🛠️ Implementation Instructions
+
+#### 1. 🛤️ **New Route/Page**
+
+* Create a **new route**:
+
+  ```
+  /admin/companies/[companyId].tsx
+  ```
+* This should be a standalone full-page view.
+* Clicking **“View”** or **“Manage”** on a company card should link to this page with the correct ID passed via router param.
+
+> 🧠 **Important**: Do **not** remove or refactor the company card modals (`View Dispatches`, `License Settings`). These are quick-access tools that should remain. This new page is a deep-dive alternative view.
+
+---
+
+#### 2. 📊 **Data Loading**
+
+You must fetch data from **three sources**:
+
+* `GET /api/tenants/:id` → Company info
+* `GET /api/dispatches?tenantId=...` → All dispatches for the company
+* `GET /api/courses` → Master list of courses (to resolve `courseId → title`)
+
+Implement proper **loading state** (e.g. spinner or skeleton) while this data loads.
+
+---
+
+#### 3. 🧩 **Page Layout**
+
+Break the page into the following three sections:
+
+##### 🟦 Section 1: Company Overview
+
+* Display:
+
+  * Company Name
+  * ID
+  * Creation Date
+  * Count of assigned dispatches
+
+##### 🟨 Section 2: Assigned Courses
+
+* **Derive this from the dispatch list**.
+* For each dispatch, cross-reference `courseId` with the master course list to get the title.
+* Show:
+
+  * Course title
+  * Assigned date (createdAt)
+  * Expiration date
+  * Max users
+* Display these in a **list or card format** — not a table.
+
+##### 🟥 Section 3: Raw Dispatch Table
+
+* Tabular view of every dispatch for the company.
+* Columns:
+
+  * Dispatch UUID
+  * Course title (resolved from courseId)
+  * Created At
+  * Expires At
+  * Max Users
+
+---
+
+### 🔒 UX Rules
+
+* “View Dispatches” and “License Settings” should **stay on the card** on `/admin/companies` — we’re adding, not replacing.
+* The card’s “View” or “Manage” button should `router.push()` to this new profile page.
+* Include a “Back to Companies” link or breadcrumb on the detail view.
+
+---
+
+### 📁 File Targets
+
+* New file: `apps/web/app/admin/companies/[companyId].tsx`
+* Shared logic can go into a new helper file if needed (e.g. `utils/companyDispatchHelpers.ts`)
+
+---
+
+### 🔍 Final Checks
+
+✅ Existing cards must remain untouched
+✅ All dispatches must match tenantId from URL
+✅ Course titles must be resolved from courseId
+✅ No dummy data or unlinked fields
+
+---
+
+Let me know if you want the follow-up prompt after this one — for filtering or managing course removals per tenant.

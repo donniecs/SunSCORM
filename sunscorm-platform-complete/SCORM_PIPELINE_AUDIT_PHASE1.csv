@@ -1,0 +1,56 @@
+File Path,Component Type,Function/Method,Lines of Code,Current State,Issues Identified,Action Required,Priority,Dependencies,Estimated Effort
+server/scormValidator.ts,Validation,validateSCORMPackage(),349,Basic regex parsing,No node-sco-parser integration; basic ZIP validation only,Replace with node-sco-parser,HIGH,node-sco-parser package,8 hours
+server/scormValidator.ts,Validation,validateSCORMManifest(),95,Basic yauzl ZIP parsing,No XML schema validation; regex-based SCORM detection,Integrate XML schema validation,HIGH,xml2js or fast-xml-parser,6 hours  
+server/scormValidator.ts,Validation,analyzeSCORMManifest(),90,Regex XML parsing,No proper SCORM 2004 manifest→metadata→organizations→resources validation,Implement proper manifest rule validation,HIGH,SCORM 2004 spec compliance,12 hours
+server/services/scormService.ts,Service,parseManifest(),40,Duplicate XML parsing,Same logic as scormValidator but different implementation,Consolidate with validator into unified service,MEDIUM,Refactor coordination,4 hours
+server/services/scormService.ts,Service,findSCORMEntryPoint(),25,Cached ZIP extraction,Good performance but no scorm-again integration,Add scorm-again entry point detection,MEDIUM,scorm-again package,3 hours
+server/services/scormService.ts,Service,extractZipToCache(),55,Memory caching,Efficient but no scorm-again.js injection for rebuilding,Add package rebuilding capability,HIGH,scorm-again integration,10 hours
+server/routes/courses.ts,Route,POST /api/courses/upload,65,Basic SCORM upload,Uses validateSCORMPackage; no manifest enforcement at root,Replace validation with node-sco-parser; add imsmanifest.xml root validation,HIGH,node-sco-parser integration,6 hours
+server/routes/upload.ts,Route,Chunked upload system,388,Advanced chunked upload,Good for large files but uses same basic validation,Integrate node-sco-parser into chunked upload,MEDIUM,Validation system update,4 hours
+server/routes/dispatches.ts,Route,POST /api/dispatches,90,Dispatch creation,Basic ZIP export with hardcoded manifest generation,Implement proper SCORM package builder with scorm-again,HIGH,scorm-again integration,15 hours
+server/routes/dispatches.ts,Route,Dispatch ZIP export,120,Template injection,Basic __LAUNCH_URL__ replacement; no scorm-again.js injection,Add scorm-again.js to ZIP; setup window.API,HIGH,scorm-again runtime,12 hours
+server/templates/scorm-loader.html,Template,SCORM loader,260,Professional loader UI,Beautiful loader but no scorm-again.js; basic redirect only,Add <script src=""scorm-again.js""></script>; setup window.API/window.API_1484_11,HIGH,scorm-again integration,8 hours
+server/routes/launch.ts,Route,GET /launch/:token,27,Token validation,Basic token lookup and redirect,Implement SCORM Cloud-style frameset with scorm-again adapter,HIGH,SCORM runtime implementation,20 hours
+server/routes/launch.ts,Route,GET /launch/:token/assets/*,12,Asset serving,Basic file serving from ZIP,Add proper SCORM API setup for served assets,MEDIUM,SCORM runtime coordination,6 hours
+server/services/launchService.ts,Service,handleSCORMLaunch(),90,Launch orchestration,Good permission checks but no SCORM API runtime,Integrate scorm-again runtime adapter,HIGH,scorm-again implementation,15 hours
+server/services/launchService.ts,Service,handleLaunchAssets(),32,Asset extraction,Uses scormService for extraction,Add SCORM API context to asset serving,MEDIUM,Runtime coordination,4 hours
+server/services/launchService.ts,Service,generateLaunchFile(),51,Launch file generation,Template injection for external LMS,Add scorm-again.js to generated files,HIGH,Package builder integration,6 hours
+server/routes.ts,Route,Preview routes,Unknown,Preview system,Need to locate and examine preview route handlers,Audit preview system for SCORM API simulation,MEDIUM,System mapping,8 hours
+client/src/pages/course-preview.tsx,UI Component,CoursePreview(),125,Preview player,Basic iframe with loading states; no SCORM API simulation,Add SCORM API simulation UI for testing,MEDIUM,SCORM API mock,10 hours
+client/src/components/courses/course-upload.tsx,UI Component,CourseUpload(),350,Upload form,Advanced with chunked upload support and progress,Enhance validation feedback with SCORM type detection,LOW,UI enhancement,4 hours
+client/src/components/courses/course-edit.tsx,UI Component,CourseEdit(),200,Course editing,Basic form; supports file replacement,Add file replacement warning UI,LOW,UI enhancement,2 hours
+client/src/components/dispatches/create-dispatch.tsx,UI Component,CreateDispatch(),175,Dispatch creation,Good form validation and tenant selection,Add dispatch export progress indicators,LOW,UI enhancement,3 hours
+client/src/utils/chunked-upload.ts,Utility,ChunkedUploader class,297,Chunked upload,Robust implementation with progress tracking,Integrate with enhanced SCORM validation,LOW,Validation integration,2 hours
+server/routes-old.ts,Legacy,Old route handlers,Unknown,Legacy code,Contains old SCORM logic that may conflict,Remove completely after migration verification,LOW,Migration completion,1 hour
+missing,Dependency,node-sco-parser,0,Not installed,Missing professional SCORM validation library,Install and integrate for manifest validation,HIGH,Package installation,1 hour
+missing,Dependency,scorm-again,0,Not installed,Missing SCORM runtime adapter library,Install and integrate for API setup,HIGH,Package installation,1 hour
+missing,Dependency,xml2js or fast-xml-parser,0,Not installed,Missing proper XML parsing for manifests,Install for enhanced manifest parsing,MEDIUM,Package installation,0.5 hours
+missing,Error Handling,Error pages,0,Not implemented,No specialized error pages for SCORM edge cases,Create error templates for manifest/token/extraction failures,MEDIUM,Error handling,6 hours
+missing,Testing,SCORM validation tests,0,Not implemented,No unit tests for SCORM pipeline,Create comprehensive test suite,MEDIUM,Testing infrastructure,20 hours
+missing,Testing,SCOverseer integration,0,Not implemented,No external SCORM compliance testing,Integrate testing hooks for SCORM Cloud/SCOverseer,LOW,External testing,8 hours
+missing,Middleware,SCORM validation middleware,0,Not implemented,Validation logic scattered across routes,Create reusable middleware,MEDIUM,Code organization,4 hours
+missing,Middleware,Error handling middleware,0,Not implemented,SCORM-specific error handling scattered,Create centralized SCORM error handling,MEDIUM,Error coordination,3 hours
+missing,UI Component,SCORMPlayer unified component,0,Not implemented,No reusable SCORM player component,Create unified player for preview/launch,MEDIUM,UI architecture,12 hours
+missing,UI Component,SCORM error boundaries,0,Not implemented,No React error boundaries for SCORM failures,Add error boundaries with user-friendly messages,LOW,Error handling,4 hours
+missing,Route Module,server/routes/preview.ts,0,Not implemented,Preview logic mixed in main routes,Extract to dedicated module,LOW,Code organization,3 hours
+missing,Service,Package builder service,0,Not implemented,ZIP building logic scattered,Create unified package builder with scorm-again,HIGH,Architecture,15 hours
+missing,Validation,SCORM 2004 manifest schema,0,Not implemented,No enforcement of manifest→metadata→organizations→resources rules,Implement strict schema validation,HIGH,SCORM compliance,10 hours
+missing,Runtime,SCORM API simulation,0,Not implemented,Preview mode has no progress persistence,Add preview API simulation with LocalStorage,MEDIUM,Preview enhancement,8 hours
+missing,Configuration,Max file size validation,0,Inconsistent,Different size limits across upload methods,Standardize 512MB limit system-wide,LOW,Configuration,2 hours
+missing,Documentation,SCORM integration guide,0,Not implemented,No developer documentation for SCORM pipeline,Create comprehensive integration documentation,LOW,Documentation,6 hours
+performance,Optimization,ZIP extraction caching,Implemented,Working well,Good performance but could be enhanced,Optimize cache cleanup and memory usage,LOW,Performance,4 hours
+performance,Optimization,SCORM API setup,0,Not implemented,Window.API setup not optimized for different SCORM versions,Implement version-specific API optimization,MEDIUM,SCORM compliance,6 hours
+duplication,Logic,Manifest parsing,2 implementations,Inconsistent,parseManifest() in both scormValidator and scormService,Consolidate into single authoritative implementation,MEDIUM,Code quality,3 hours
+duplication,Logic,Entry point detection,2 implementations,Inconsistent,Different logic in routes vs service,Unify entry point detection logic,MEDIUM,Code quality,2 hours
+duplication,Logic,ZIP file handling,3 implementations,Scattered,yauzl usage in validator; service; and routes,Create unified ZIP handling service,MEDIUM,Architecture,5 hours
+inconsistency,UI,Page headers,Multiple files,Inconsistent,Different header patterns across SCORM pages,Standardize page headers and navigation,LOW,UI consistency,3 hours
+inconsistency,Naming,Route naming,Multiple files,Inconsistent,Some routes use 'Companies' vs 'Tenants',Standardize terminology system-wide,LOW,Consistency,2 hours
+inconsistency,Validation,File type checking,Multiple files,Inconsistent,Different allowed MIME types and extensions,Standardize file type validation,LOW,Validation,1 hour
+security,Validation,ZIP bomb protection,0,Not implemented,No protection against malicious ZIP files,Add ZIP bomb detection and size limits,MEDIUM,Security,4 hours
+security,API,SCORM API security,0,Not implemented,No validation of SCORM API calls,Add API call validation and sanitization,MEDIUM,Security,6 hours
+compatibility,SCORM,Version detection,Basic,Limited,Basic SCORM 1.2/2004 detection only,Enhance version detection with feature detection,MEDIUM,Compatibility,5 hours
+compatibility,LMS,Frameset approach,0,Not implemented,No SCORM Cloud-style frameset for LMS compatibility,Implement proper frameset with fallback,HIGH,LMS integration,12 hours
+usability,UI,Upload feedback,Basic,Limited,Basic progress indicators only,Enhanced feedback with file analysis results,LOW,User experience,4 hours
+usability,UI,Preview testing,Basic,Limited,No tools for testing SCORM functionality before dispatch,Add comprehensive preview testing tools,MEDIUM,User experience,10 hours
+maintenance,Code Organization,Route modularity,Partial,In progress,Some routes modularized; main routes.ts still large,Complete route modularization,MEDIUM,Code organization,6 hours
+maintenance,Error Handling,Edge case coverage,Limited,Gaps identified,Missing handlers for many SCORM edge cases,Add comprehensive edge case handling,MEDIUM,Robustness,8 hours

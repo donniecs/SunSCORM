@@ -1,0 +1,113 @@
+🔥 TASK: Add Fully Systematic “Delete Course” Function (Without Breaking Dispatch History)
+🧠 Business Logic Overview
+Courses can now be deleted from the site via the UI, but the deletion must NOT break:
+
+Company dispatch history
+
+Analytics
+
+Audit trails
+
+Prior user completions
+
+Instead, we're implementing a soft delete system on the course model (isDisabled + deletedAt) that:
+
+Removes the course from all active views and dispatch creation flows
+
+Preserves its data across all historical records (e.g., dispatch history per company)
+
+✅ SCOPE
+🖱️ 1. Frontend — Add Delete Option in UI
+File to Edit:
+client/src/pages/courses.tsx or CourseCard.tsx (depending on component layout)
+
+Action Items:
+
+Add a three-dot (⋯) dropdown menu on each course card
+
+Include a new Delete button in the dropdown
+
+On click → open confirmation modal (Are you sure? This will remove the course from all active use but preserve historical records.)
+
+If confirmed → call DELETE endpoint
+
+🔒 Disable the delete option if the course is still actively assigned (use existing dispatches logic to block or warn)
+
+🌐 2. Backend — Soft Delete Handler
+File to Edit:
+server/routes/courses.ts
+
+Action Items:
+
+Add a DELETE /api/courses/:id route
+
+Implement soft delete:
+
+isDisabled: true
+
+deletedAt: new Date()
+
+Ensure this route verifies:
+
+Course exists
+
+Request is admin-only
+
+No active dispatches exist (optional enforcement or frontend-enforced)
+
+🧹 3. System-Wide Impacts (Ensure Proper Filtering)
+All existing routes, pages, and components must be updated to respect the new soft-delete logic.
+
+Specifically:
+
+Component	Action
+/api/courses	Filter out isDisabled: true by default
+/dispatches.tsx	Prevent selecting deleted courses
+/course-edit.tsx	Do not allow editing deleted courses
+company-profile.tsx	Still show title of deleted courses in history (use cross-reference even if soft-deleted)
+Global search	Hide deleted courses unless explicitly requested
+Analytics	Must continue counting completions from deleted courses
+
+📦 4. Model & DB Logic
+Ensure Course model includes the following fields:
+
+ts
+Copy
+Edit
+isDisabled: boolean; // default: false
+deletedAt: Date | null; // default: null
+Update Prisma or Drizzle schema accordingly.
+
+🧪 5. Testing
+ Try deleting a course with no active dispatches → should succeed
+
+ Try dispatching a deleted course → should be blocked
+
+ Visit /companies/:id and confirm deleted course titles still show in dispatch history
+
+ Validate analytics and stats still include deleted course completions
+
+ Confirm deleted course is NOT visible on /courses
+
+🔗 SYSTEM INTEGRATION NOTE
+Everything must be done systematically. If you touch a model or UI, validate where else it’s referenced in:
+
+Dispatch creation
+
+Analytics aggregation
+
+Company course history
+
+Course preview or launch links
+
+This cannot break any part of the existing dispatch system.
+
+Prompt to Send to Replit Agent:
+
+🚨 Implement full-system course deletion using a soft-delete approach (isDisabled, deletedAt).
+Add delete button on course cards (⋯ menu).
+When deleted, course is removed from all creation flows and views but still visible in company dispatch history.
+Update all components and routes to respect soft delete logic.
+Confirm launch flow, analytics, and legacy views still function.
+If course is actively dispatched, prevent deletion or warn admin.
+This must be implemented systematically across all pages and components that use Course data.

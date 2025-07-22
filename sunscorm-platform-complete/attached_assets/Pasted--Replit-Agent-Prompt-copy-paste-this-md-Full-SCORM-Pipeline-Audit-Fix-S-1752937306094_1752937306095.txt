@@ -1,0 +1,145 @@
+
+---
+
+## ✅ Replit Agent Prompt (copy-paste this)
+
+```md
+🎯 Full SCORM Pipeline Audit & Fix – Sun SCORM Platform
+
+We’re running a custom SCORM dispatch platform (Sun SCORM) and need a **full audit + cleanup** of the entire SCORM workflow. We're facing upload issues (413), broken previews, failed dispatch launches in 3rd-party LMSs (e.g., TalentLMS), and scattered postMessage failures.
+
+Please go through **ALL of this end-to-end** and fix **uploading**, **dispatching**, **previewing**, **launching**, and **proxy redirect logic** as a single coherent pipeline.
+
+---
+
+## 📂 1. SCORM Upload Endpoint: `/api/courses/upload`
+
+🛑 Uploading SCORM ZIPs (200MB–400MB) to the deployed domain fails with:
+
+```
+
+POST /api/courses/upload → 413 Payload Too Large
+
+```
+
+✅ Fix:
+- Increase Express body/file limits to at least `512MB`
+- Ensure multer or express-fileupload is used correctly
+- Do NOT use `bodyParser.json()` for file uploads
+- Validate and store `imsmanifest.xml`
+- Verify imsmanifest is at the ZIP root and parsed correctly
+
+🧪 Test: Upload a 220MB SCORM course. Course should appear in admin dashboard.
+
+---
+
+## 🧪 2. Course Preview (Before Dispatch)
+
+✅ We need to test run SCORM **on our own site before dispatching**
+
+- Add a **preview button** to the course card or modal
+- Clicking preview should launch the SCORM course **directly from our site**, not from dispatch
+- Inject necessary loader wrapper if needed
+- Show preview in iframe or new tab
+
+🧠 This is essential QA before creating a dispatch ZIP
+
+---
+
+## 🚀 3. SCORM Dispatch Logic
+
+✅ Create dispatch ZIPs that:
+
+- Contain **index.html** with injected `launch_url`
+- `launch_url` must point to:  
+```
+
+[https://sun-scorm-manager-dscalessa1010.replit.app/launch/](https://sun-scorm-manager-dscalessa1010.replit.app/launch/)<dispatchToken>
+
+```
+
+- Token must resolve to a real dispatch + user in the DB
+- Route `/launch/:token` should validate token and return proper SCORM loader page
+
+---
+
+## 🌐 4. Dispatch Launch Testing (In 3rd Party LMSs)
+
+🧪 Test launching the generated dispatch ZIP in **TalentLMS**
+
+Currently shows:
+```
+
+Invalid launch URL
+launch\_url is undefined
+TypeError: Cannot read properties of undefined (reading 'launch\_url')
+
+```
+
+✅ Fix:
+- Ensure dispatch ZIP does **not use scorm_loaderV2.html** — that version still uses postMessage and fails
+- Inject launch URL at build time inside index.html
+- Use fallback content and messaging when token is invalid
+- Ensure launch loads SCORM content in iframe and calls SCORM JS API
+
+---
+
+## 🔐 5. Auth & CORS Issues
+
+Fix errors like:
+
+- 401 Unauthorized (missing/bad token)
+- 403 Forbidden (valid auth, bad role)
+- Invalid refresh_token errors
+- CORS rejecting embedded SCORM loads in LMS
+
+✅ Ensure:
+- `/launch/:token` works without auth (public launch)
+- Admin auth still works for uploads, dispatch creation, etc.
+- CORS allows LMS embedding of launch URLs
+
+---
+
+## 🧹 6. General Code Cleanup
+
+Refactor and clean up:
+- Launch token handling
+- Loader HTML duplication (remove unused `scorm_loaderV2.html`)
+- Fallback messaging and 404 handling
+- Centralize config for BASE_URL for launch injection
+
+---
+
+## 📚 Reference
+
+This system is modeled after SCORM Cloud's dispatch engine. We’ve provided technical research on:
+
+- `imsmanifest.xml` placement rules
+- API discovery (`API` vs `API_1484_11`)
+- postMessage pitfalls
+- Proxying SCORM API calls for cross-domain
+- CORS + secure launch URLs
+- Error debugging (401s, launch_url undefined)
+
+All of this must be considered when testing.
+
+---
+
+## 🧪 Final Test Criteria
+
+- Upload a real SCORM ZIP (~200MB)
+- See it appear in dashboard
+- Preview launches from admin view
+- Create dispatch ZIP
+- Import into TalentLMS
+- Launch works (no console errors, no postMessage crashes)
+- Tracking persists via SCORM API (initialize, commit, etc)
+
+---
+
+✅ Start by auditing all relevant files related to SCORM upload, storage, dispatch, and launch. Fix anything that breaks the chain.
+
+This needs to work fully end-to-end in **the deployed domain**.
+
+```
+

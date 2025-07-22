@@ -1,0 +1,89 @@
+🚀 Phase 2: SCORM Pipeline Implementation
+1. Install Formal Validator & Runtime
+node-sco-parser for reliable SCORM zip and manifest validation
+
+✅ Validates presence and structure of imsmanifest.xml, gives entry-point SCO info 
+Stack Overflow
++3
+GitHub
++3
+SCORM.com
++3
+
+scorm-again for true browser-based SCORM API runtime
+
+Supports SCORM 1.2 & SCORM 2004, handles window.API/_1484_11, sequencing, autocommit 
+SCORM.com
++9
+GitHub
++9
+npm
++9
+
+📦
+
+nginx
+Copy
+Edit
+npm install node-sco-parser scorm-again
+2. Swap Out Regex-Based SCORM Validation
+In server/scormValidator.ts & related:
+
+Replace regex/XML hacks with:
+
+js
+Copy
+Edit
+const parser = require('node-sco-parser')({
+  pathToScoZip: zipPath,
+  pathToExtractZip: extractDir
+});
+parser.validate(...);
+parser.parse(...); // get scoHtmlHref
+Ensure proper error paths for missing/corrupt imsmanifest.xml
+
+3. Unify Parsing Logic
+Merge overlapping manifest parsing in scormService.ts and validator
+
+Use single source of truth from node-sco-parser to reduce bugs and trim tech debt
+
+4. Inject scorm-again in Loader & Launcher HTML
+In server/templates/scorm-loader.html (or loader used in dispatches/launch):
+
+html
+Copy
+Edit
+<script src="/assets/scorm-again.min.js"></script>
+<script>
+  window.API_1484_11 = new window.ScormAgain.Scorm2004API({
+    enableOfflineSupport: true,
+    autocommit: true,
+    lmsCommitUrl: '<%= dispatchCommitUrl %>'
+  });
+</script>
+Ensure both SCORM 1.2 (window.API) and SCORM 2004 (window.API_1484_11) available
+
+5. Rewrite /launch/:token Route
+Serve full SCORM frameset, not JSON
+
+Example flow:
+
+GET /launch/:token → locate SCORM zip, unpack to temp dir
+
+Render launch page with embedded <script> from scorm-again and entry-point iframe
+
+Serve assets with proper streaming under /launch/:token/assets/*
+
+This replaces old JSON responses and postMessage hackery, so you avoid “undefined launch_url” issues
+
+6. Confirm Runtime API is Active
+On the launch page, check console for:
+
+window.API or window.API_1484_11 setup success
+
+Calls like LMSInitialize(), LMSCommit(), LMSFinish() being logged
+
+Real communication with LMS simulated via the lmsCommitUrl
+
+✅ Whats Next?
+Once scorm-again is correctly wired in the loader and /launch/:token delivers a proper frameset and API, external LMS platforms like TalentLMS will be able to host and track your content—just like SCORM Cloud does.
